@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { User, Mail, ShieldCheck, CheckCircle2, AlertCircle, KeyRound } from 'lucide-react';
+import { useThemeStore } from '@/stores/useThemeStore';
+import { clsx } from 'clsx';
+import { User, Mail, ShieldCheck, CheckCircle2, AlertCircle, KeyRound, Sun, Moon } from 'lucide-react';
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -15,6 +17,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
   onChangePasswordClick,
 }) => {
   const { user, updateProfile } = useAuthStore();
+  const { theme, setTheme } = useThemeStore();
   const [fullName, setFullName] = useState(user?.fullName || '');
   const [email, setEmail] = useState(user?.email || '');
   const [error, setError] = useState<string | null>(null);
@@ -132,6 +135,58 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
               placeholder="admin@cityride.tumakuru.gov.in"
               className="w-full rounded-xl border border-slate-300 bg-white pl-10 pr-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500 transition"
             />
+          </div>
+        </div>
+
+        {/* Interface Theme Preference */}
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+            Interface Theme
+          </label>
+          <div className="grid grid-cols-2 gap-2.5">
+            <button
+              type="button"
+              onClick={() => setTheme('light')}
+              className={clsx(
+                'flex items-center justify-between rounded-xl border p-2.5 text-left transition cursor-pointer',
+                theme === 'light'
+                  ? 'border-brand-500 bg-brand-50/60 ring-2 ring-brand-500/20 dark:border-brand-500 dark:bg-brand-950/30'
+                  : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900/60 dark:hover:border-slate-700'
+              )}
+            >
+              <div className="flex items-center space-x-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100/70 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400">
+                  <Sun className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-slate-900 dark:text-white">Light Mode</p>
+                  <p className="text-[10px] text-slate-400">Standard clean</p>
+                </div>
+              </div>
+              {theme === 'light' && <CheckCircle2 className="h-4 w-4 text-brand-600 dark:text-brand-400 flex-shrink-0" />}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setTheme('dark')}
+              className={clsx(
+                'flex items-center justify-between rounded-xl border p-2.5 text-left transition cursor-pointer',
+                theme === 'dark'
+                  ? 'border-brand-500 bg-brand-50/60 ring-2 ring-brand-500/20 dark:border-brand-500 dark:bg-brand-950/30'
+                  : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900/60 dark:hover:border-slate-700'
+              )}
+            >
+              <div className="flex items-center space-x-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100/70 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
+                  <Moon className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-slate-900 dark:text-white">Dark Mode</p>
+                  <p className="text-[10px] text-slate-400">Low eye strain</p>
+                </div>
+              </div>
+              {theme === 'dark' && <CheckCircle2 className="h-4 w-4 text-brand-600 dark:text-brand-400 flex-shrink-0" />}
+            </button>
           </div>
         </div>
 

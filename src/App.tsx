@@ -1,6 +1,7 @@
 import React, { useEffect, Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useThemeStore } from '@/stores/useThemeStore';
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Radio } from 'lucide-react';
@@ -60,27 +61,33 @@ const TripHistory = lazy(() =>
   import('@/features/analytics/pages/TripHistory').then((m) => ({ default: m.TripHistory }))
 );
 
-// OCC Page Loading Spinner Fallback
+// OCC Module Loading Fallback - Clean Standard Professional Minimalist
 const OCCLoadingFallback: React.FC = () => (
-  <div className="flex h-[60vh] w-full flex-col items-center justify-center space-y-3">
-    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-      <Radio className="h-6 w-6 animate-pulse" />
+  <div className="flex h-[60vh] w-full flex-col items-center justify-center space-y-4 select-none">
+    {/* Smooth Ring Spinner */}
+    <div className="relative flex items-center justify-center">
+      <div className="h-9 w-9 rounded-full border-[2.5px] border-slate-200 dark:border-slate-800" />
+      <div className="absolute h-9 w-9 rounded-full border-[2.5px] border-transparent border-t-slate-800 dark:border-t-white animate-spin [animation-duration:0.85s]" />
     </div>
-    <div className="space-y-1 text-center">
-      <p className="text-xs font-black tracking-wider text-slate-800 uppercase dark:text-slate-200">
-        Loading Operations Module...
+
+    {/* Bottom Loading Text */}
+    <div className="text-center space-y-0.5">
+      <p className="text-xs font-semibold tracking-widest text-slate-700 dark:text-slate-300 uppercase">
+        Loading Module
       </p>
-      <span className="text-[10px] text-slate-400">CITYRIDE Control Center</span>
+      <span className="text-[11px] text-slate-400 font-medium">Please wait...</span>
     </div>
   </div>
 );
 
 export const App: React.FC = () => {
   const { initializeAuth } = useAuthStore();
+  const { initializeTheme } = useThemeStore();
 
   useEffect(() => {
     initializeAuth();
-  }, [initializeAuth]);
+    initializeTheme();
+  }, [initializeAuth, initializeTheme]);
 
   return (
     <Suspense fallback={<OCCLoadingFallback />}>

@@ -44,10 +44,14 @@ export const KPICard: React.FC<KPICardProps> = ({
 
   if (isLoading) {
     return (
-      <div className="animate-pulse rounded-2xl bg-[#1e1f24] p-6 shadow-md">
-        <div className="h-11 w-11 rounded-full bg-white/20" />
-        <div className="mt-5 h-9 w-20 rounded bg-white/20" />
-        <div className="mt-2 h-4 w-28 rounded bg-white/20" />
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 shadow-md dark:border-slate-800 dark:bg-[#1e1f24] animate-pulse">
+        <div className="flex items-center justify-between">
+          <div className="h-11 w-11 rounded-full bg-slate-200 dark:bg-white/15" />
+        </div>
+        <div className="mt-5 space-y-2">
+          <div className="h-8 w-24 rounded-lg bg-slate-200 dark:bg-white/20" />
+          <div className="h-3.5 w-32 rounded bg-slate-200/80 dark:bg-white/10" />
+        </div>
       </div>
     );
   }

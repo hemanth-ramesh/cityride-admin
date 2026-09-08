@@ -5,6 +5,8 @@ import { AdminRole } from '@/types/auth';
 import { isAuthorizedRole, ROLE_LABELS, ROLE_BADGE_STYLES } from '@/utils/rbac';
 import { ShieldAlert, ArrowLeft } from 'lucide-react';
 
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
+
 interface ProtectedRouteProps {
   allowedRoles?: AdminRole[];
   children?: React.ReactNode;
@@ -16,12 +18,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, ch
 
   if (isLoading) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-occ-bg dark:bg-occ-darkBg">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-500 border-t-transparent" />
-          <p className="text-sm font-medium text-occ-muted">Loading CITYRIDE Control Center...</p>
-        </div>
-      </div>
+      <LoadingScreen
+        message="Loading CityRide Control Center"
+        subtext="Verifying authorized personnel session..."
+      />
     );
   }
 

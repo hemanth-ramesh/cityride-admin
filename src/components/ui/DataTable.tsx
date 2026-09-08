@@ -188,9 +188,14 @@ export function DataTable<T>({
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i} className="animate-pulse">
-                  {columns.map((col) => (
-                    <td key={col.key} className="px-4 py-3.5">
-                      <div className="h-4 w-3/4 rounded bg-slate-200 dark:bg-slate-800" />
+                  {columns.map((col, cIdx) => (
+                    <td key={col.key} className="px-4 py-4">
+                      <div
+                        className={clsx(
+                          'h-4 rounded-lg bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 dark:from-slate-800 dark:via-slate-700 dark:to-slate-800',
+                          cIdx === 0 ? 'w-24' : cIdx === 1 ? 'w-48' : cIdx === columns.length - 1 ? 'w-20' : 'w-32'
+                        )}
+                      />
                     </td>
                   ))}
                 </tr>
