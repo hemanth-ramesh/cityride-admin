@@ -112,16 +112,16 @@ export function DataTable<T>({
   return (
     <div
       className={clsx(
-        'flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-occ-darkCard',
+        'flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-none dark:border-slate-800 dark:bg-occ-darkCard',
         className
       )}
     >
       {/* Table Toolbar */}
       {(searchable || toolbarActions) && (
-        <div className="flex flex-col gap-3 border-b border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
+        <div className="flex flex-col gap-3 border-b border-slate-100 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
           {searchable && (
             <div className="relative w-full max-w-xs">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 value={searchQuery}
@@ -130,7 +130,7 @@ export function DataTable<T>({
                   setCurrentPage(1);
                 }}
                 placeholder={searchPlaceholder}
-                className="w-full rounded-lg border border-slate-300 bg-slate-50/50 py-1.5 pl-9 pr-3 text-xs text-occ-text placeholder:text-slate-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white"
+                className="w-full rounded-full border border-slate-200/80 bg-slate-100/80 py-2 pl-9 pr-3.5 text-xs text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700/80 dark:bg-slate-800/60 dark:text-white transition-all"
               />
             </div>
           )}

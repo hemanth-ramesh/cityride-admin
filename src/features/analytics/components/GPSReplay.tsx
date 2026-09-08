@@ -83,29 +83,29 @@ export const GPSReplay: React.FC<GPSReplayProps> = ({ trip, className }) => {
   return (
     <div className={clsx('space-y-4 text-xs', className)}>
       {/* Trip Header Banner */}
-      <div className="flex flex-col justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center dark:border-slate-800 dark:bg-occ-darkCard">
+      <div className="flex flex-col justify-between gap-3 rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-900">
         <div>
-          <div className="flex items-center space-x-2">
-            <span className="rounded-lg bg-brand-700 px-2.5 py-0.5 font-mono text-xs font-black text-white">
+          <div className="flex items-center space-x-2.5">
+            <span className="rounded-full bg-blue-600 px-3 py-1 font-mono text-xs font-bold text-white shadow-xs">
               {trip.routeCode}
             </span>
             <h3 className="font-bold text-sm text-slate-900 dark:text-white">
               {trip.routeName}
             </h3>
-            <span className="font-mono text-xs font-bold text-brand-600 dark:text-brand-400">
+            <span className="font-mono text-xs font-semibold text-blue-600 dark:text-blue-400">
               ({trip.tripCode})
             </span>
           </div>
-          <p className="mt-1 text-[11px] text-slate-500">
-            Date: {trip.date} • Vehicle: <strong className="text-slate-700 dark:text-slate-200">{trip.plateNumber}</strong> • Driver: <strong className="text-slate-700 dark:text-slate-200">{trip.driverName}</strong>
+          <p className="mt-1.5 text-xs text-slate-500">
+            Date: {trip.date} • Vehicle No: <strong className="text-slate-700 dark:text-slate-200 font-semibold">{trip.plateNumber}</strong> • Driver: <strong className="text-slate-700 dark:text-slate-200 font-semibold">{trip.driverName}</strong>
           </p>
         </div>
 
         {/* Telemetry Stats Pill */}
         <div className="flex items-center space-x-3 text-xs font-mono">
-          <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 dark:border-slate-800 dark:bg-slate-900">
-            <span className="text-[10px] text-slate-400 block uppercase">Timestamp</span>
-            <span className="font-bold text-slate-800 dark:text-slate-200">
+          <div className="rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-2 dark:border-slate-800 dark:bg-slate-800/80">
+            <span className="text-[10px] text-slate-400 block font-sans uppercase font-medium">Telemetry Timestamp</span>
+            <span className="font-bold text-slate-900 dark:text-slate-200">
               {currentPoint?.timestamp || '--:--'}
             </span>
           </div>
@@ -192,12 +192,12 @@ export const GPSReplay: React.FC<GPSReplayProps> = ({ trip, className }) => {
       </div>
 
       {/* Playback Controls & Progress Scrubber */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-occ-darkCard space-y-3">
+      <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:border-slate-800 dark:bg-slate-900 space-y-4">
         {/* Scrubber Slider */}
-        <div className="space-y-1">
-          <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono">
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-xs text-slate-500 font-mono">
             <span>{points[0]?.timestamp || '00:00'} ({trip.originStopName.split(' ')[0]})</span>
-            <span className="font-bold text-slate-900 dark:text-white">
+            <span className="font-bold text-slate-900 dark:text-white font-sans">
               {currentPoint?.stopName ? `At Station: ${currentPoint.stopName}` : `Progress ${Math.round(((currentIndex + 1) / points.length) * 100)}%`}
             </span>
             <span>{points[points.length - 1]?.timestamp || '00:00'} ({trip.destinationStopName.split(' ')[0]})</span>
@@ -212,41 +212,41 @@ export const GPSReplay: React.FC<GPSReplayProps> = ({ trip, className }) => {
               setIsPlaying(false);
               setCurrentIndex(Number(e.target.value));
             }}
-            className="w-full cursor-pointer accent-brand-700"
+            className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-100 rounded-full"
           />
         </div>
 
         {/* Buttons Bar */}
         <div className="flex items-center justify-between pt-1">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2.5">
             <button
               onClick={() => setIsPlaying(!isPlaying)}
-              className="inline-flex items-center space-x-1.5 rounded-xl bg-brand-700 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-brand-800 transition"
+              className="inline-flex items-center space-x-2 rounded-full bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-500/25 hover:bg-blue-700 active:scale-95 transition-all"
             >
-              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-              <span>{isPlaying ? 'Pause Replay' : 'Play Replay'}</span>
+              {isPlaying ? <Pause className="h-4 w-4 fill-current" /> : <Play className="h-4 w-4 fill-current" />}
+              <span>{isPlaying ? 'Pause' : 'Play Replay'}</span>
             </button>
 
             <button
               onClick={handleReset}
-              className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="h-9 w-9 rounded-full border border-slate-200/80 bg-white flex items-center justify-center text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 active:scale-95 transition-all"
               title="Reset to origin"
             >
               <RotateCcw className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Playback Multiplier */}
-          <div className="flex items-center space-x-1">
-            <span className="text-[11px] font-semibold text-slate-400 mr-1">Pace:</span>
+          {/* Playback Multiplier - iOS Segmented Control */}
+          <div className="inline-flex items-center gap-1 p-1 rounded-full bg-slate-100/90 border border-slate-200/80 dark:bg-slate-800/90 dark:border-slate-700/80">
+            <span className="text-[10px] font-semibold text-slate-400 px-2 uppercase">Speed</span>
             {[1, 2, 5, 10].map((speed) => (
               <button
                 key={speed}
                 onClick={() => setPlaybackSpeed(speed)}
-                className={`rounded-lg px-2.5 py-1 text-xs font-mono font-bold transition ${
+                className={`rounded-full px-2.5 py-1 text-xs font-mono font-bold transition-all active:scale-95 ${
                   playbackSpeed === speed
-                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                    : 'border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300'
+                    ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
+                    : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
                 {speed}x

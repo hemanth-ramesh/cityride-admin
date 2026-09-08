@@ -7,6 +7,7 @@ import { Modal } from '@/components/ui/Modal';
 import { PassengerDetailModal } from '../components/PassengerDetailModal';
 import { ServiceNavigationTabs } from '../components/ServiceNavigationTabs';
 import { TableColumn } from '@/types';
+import { KPICard } from '@/components/ui/KPICard';
 import {
   UserCheck,
   Eye,
@@ -16,6 +17,8 @@ import {
   GitFork,
   CheckCircle2,
   ShieldAlert,
+  Users,
+  Globe,
 } from 'lucide-react';
 
 export const Passengers: React.FC = () => {
@@ -42,7 +45,7 @@ export const Passengers: React.FC = () => {
       sortable: true,
       render: (row) => (
         <div className="flex items-center space-x-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 font-bold text-slate-800 dark:bg-slate-800 dark:text-slate-200">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 font-bold text-blue-700 border border-blue-200/60 dark:from-blue-950 dark:to-indigo-950 dark:text-blue-300 dark:border-blue-800/60 shadow-xs">
             {row.fullName.charAt(0)}
           </div>
           <div>
@@ -62,7 +65,7 @@ export const Passengers: React.FC = () => {
       render: (row) => (
         <div className="flex flex-col text-xs">
           <span className="font-medium text-slate-800 dark:text-slate-200">{row.phone}</span>
-          <span className="text-[10px] text-brand-600 dark:text-brand-400 font-semibold">
+          <span className="inline-block mt-0.5 rounded-full bg-blue-50 px-2 py-0.2 text-[10px] font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 w-fit">
             {row.preferredLanguage === 'KANNADA' ? 'ಕನ್ನಡ (Kannada)' : 'English'}
           </span>
         </div>
@@ -76,9 +79,9 @@ export const Passengers: React.FC = () => {
           <span className="font-medium text-slate-800 dark:text-slate-200 truncate max-w-[150px]">
             {row.homeStopName || 'Unset'} → {row.workStopName || 'Unset'}
           </span>
-          <div className="flex items-center space-x-1 mt-0.5">
+          <div className="flex items-center space-x-1 mt-1">
             {row.favoriteRouteCodes.map((r) => (
-              <span key={r} className="rounded bg-slate-100 px-1 py-0.2 text-[9px] font-mono font-bold dark:bg-slate-800">
+              <span key={r} className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-mono font-bold dark:bg-slate-800">
                 {r}
               </span>
             ))}
@@ -113,9 +116,9 @@ export const Passengers: React.FC = () => {
       render: (row) => (
         <button
           onClick={() => setSelectedPassenger(row)}
-          className="inline-flex items-center space-x-1 rounded-lg border border-slate-300 px-2.5 py-1 text-xs font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+          className="inline-flex items-center space-x-1.5 rounded-full bg-slate-100 px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 active:scale-95 transition-all"
         >
-          <Eye className="h-3.5 w-3.5" />
+          <Eye className="h-3.5 w-3.5 text-slate-500" />
           <span>View Profile</span>
         </button>
       ),
@@ -129,37 +132,47 @@ export const Passengers: React.FC = () => {
 
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <div className="flex items-center space-x-2">
-            <UserCheck className="h-6 w-6 text-brand-700 dark:text-brand-400" />
-            <h1 className="text-2xl font-extrabold tracking-tight text-occ-text dark:text-white">
+        <div className="flex items-center space-x-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 shadow-xs">
+            <UserCheck className="h-6 w-6" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               Passenger Accounts & Directory
             </h1>
+            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+              Registered citizen passenger profiles, favorite transit corridors, and emergency contacts (zero payment data).
+            </p>
           </div>
-          <p className="mt-1 text-xs text-occ-muted dark:text-slate-400">
-            Registered citizen passenger profiles, favorite transit corridors, and emergency contacts (zero payment data).
-          </p>
         </div>
       </div>
 
       {/* Metrics Summary Strip */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-occ-darkCard">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase">Registered App Users</span>
-          <p className="mt-1 text-2xl font-black text-slate-900 dark:text-white">{totalPassengers}</p>
-        </div>
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 shadow-sm dark:border-emerald-950 dark:bg-emerald-950/20">
-          <span className="text-[11px] font-semibold text-emerald-700 uppercase dark:text-emerald-400">Active Riders</span>
-          <p className="mt-1 text-2xl font-black text-emerald-800 dark:text-emerald-300">{activePassengers}</p>
-        </div>
-        <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-4 shadow-sm dark:border-blue-950 dark:bg-blue-950/20">
-          <span className="text-[11px] font-semibold text-blue-700 uppercase dark:text-blue-400">ಕನ್ನಡ Interface Users</span>
-          <p className="mt-1 text-2xl font-black text-blue-800 dark:text-blue-300">{kannadaUsers}</p>
-        </div>
-        <div className="rounded-xl border border-purple-200 bg-purple-50/50 p-4 shadow-sm dark:border-purple-950 dark:bg-purple-950/20">
-          <span className="text-[11px] font-semibold text-purple-700 uppercase dark:text-purple-400">English Interface Users</span>
-          <p className="mt-1 text-2xl font-black text-purple-800 dark:text-purple-300">{englishUsers}</p>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <KPICard
+          title="REGISTERED APP USERS"
+          value={totalPassengers}
+          status="dark"
+          icon={Users}
+        />
+        <KPICard
+          title="ACTIVE RIDERS"
+          value={activePassengers}
+          status="teal"
+          icon={UserCheck}
+        />
+        <KPICard
+          title="ಕನ್ನಡ INTERFACE USERS"
+          value={kannadaUsers}
+          status="info"
+          icon={Languages}
+        />
+        <KPICard
+          title="ENGLISH INTERFACE USERS"
+          value={englishUsers}
+          status="orange"
+          icon={Globe}
+        />
       </div>
 
       {/* DataTable */}

@@ -18,19 +18,15 @@ export const ScheduleForm: React.FC<ScheduleFormProps> = ({
   onCancel,
   isLoading = false,
 }) => {
-  const [routeId, setRouteId] = useState(routes[0]?.id || '');
-  const [direction, setDirection] = useState<'FORWARD' | 'REVERSE'>('FORWARD');
-  const [effectiveFrom, setEffectiveFrom] = useState('2026-01-01');
-  const [status, setStatus] = useState<'active' | 'draft' | 'archived'>('active');
+  const [routeId, setRouteId] = useState(initialData?.routeId || '');
+  const [direction, setDirection] = useState<'FORWARD' | 'REVERSE'>(initialData?.direction || 'FORWARD');
+  const [effectiveFrom, setEffectiveFrom] = useState(initialData?.effectiveFrom || new Date().toISOString().split('T')[0]);
+  const [status, setStatus] = useState<'active' | 'draft' | 'archived'>(initialData?.status || 'active');
 
-  const [slots, setSlots] = useState<TimetableSlot[]>([
-    { id: 'slot-1', tripCode: 'TRP-0600', departureTime: '06:00', arrivalTime: '06:20', frequencyType: 'ALL_DAYS', status: 'active' },
-    { id: 'slot-2', tripCode: 'TRP-0630', departureTime: '06:30', arrivalTime: '06:50', frequencyType: 'ALL_DAYS', status: 'active' },
-    { id: 'slot-3', tripCode: 'TRP-0700', departureTime: '07:00', arrivalTime: '07:20', frequencyType: 'WEEKDAY', status: 'active' },
-  ]);
+  const [slots, setSlots] = useState<TimetableSlot[]>(initialData?.slots || []);
 
-  const [newDepTime, setNewDepTime] = useState('07:30');
-  const [newArrTime, setNewArrTime] = useState('07:50');
+  const [newDepTime, setNewDepTime] = useState('');
+  const [newArrTime, setNewArrTime] = useState('');
   const [newFreq, setNewFreq] = useState<'WEEKDAY' | 'WEEKEND' | 'ALL_DAYS'>('ALL_DAYS');
 
   useEffect(() => {
@@ -40,6 +36,12 @@ export const ScheduleForm: React.FC<ScheduleFormProps> = ({
       setEffectiveFrom(initialData.effectiveFrom);
       setStatus(initialData.status);
       setSlots(initialData.slots || []);
+    } else {
+      setRouteId('');
+      setDirection('FORWARD');
+      setEffectiveFrom(new Date().toISOString().split('T')[0]);
+      setStatus('active');
+      setSlots([]);
     }
   }, [initialData]);
 
@@ -99,7 +101,7 @@ export const ScheduleForm: React.FC<ScheduleFormProps> = ({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <FormField
           label="Transit Route"
-          as="select"
+          as="search-select"
           required
           value={routeId}
           onChange={(e) => setRouteId(e.target.value)}
@@ -107,6 +109,7 @@ export const ScheduleForm: React.FC<ScheduleFormProps> = ({
             label: `${r.routeCode} — ${r.routeName}`,
             value: r.id,
           }))}
+          placeholder="Search route (e.g. R01, Town Hall)..."
           icon={Bus}
         />
 

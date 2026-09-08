@@ -6,8 +6,10 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Modal } from '@/components/ui/Modal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { IncidentForm } from '../components/IncidentForm';
+import { IncidentDetailModal } from '../components/IncidentDetailModal';
 import { SafetyNavigationTabs } from '../components/SafetyNavigationTabs';
 import { TableColumn } from '@/types';
+import { KPICard } from '@/components/ui/KPICard';
 import {
   AlertTriangle,
   Plus,
@@ -27,6 +29,7 @@ export const Incidents: React.FC = () => {
   const { incidents, isLoadingIncidents, createIncident, updateIncident } = useSafety();
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [selectedIncident, setSelectedIncident] = useState<IncidentReport | null>(null);
+  const [viewDetailIncident, setViewDetailIncident] = useState<IncidentReport | null>(null);
   const [statusConfirmIncident, setStatusConfirmIncident] = useState<{ incident: IncidentReport; newStatus: IncidentStatus } | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
@@ -75,13 +78,13 @@ export const Incidents: React.FC = () => {
   const getSeverityBadge = (severity: IncidentSeverity) => {
     switch (severity) {
       case 'CRITICAL':
-        return <span className="rounded-md bg-rose-600 px-2 py-0.5 text-[10px] font-black text-white uppercase">Critical</span>;
+        return <span className="rounded-full bg-rose-600 px-2.5 py-0.5 text-[10px] font-black text-white uppercase shadow-xs">Critical</span>;
       case 'HIGH':
-        return <span className="rounded-md bg-orange-500 px-2 py-0.5 text-[10px] font-black text-white uppercase">High</span>;
+        return <span className="rounded-full bg-orange-500 px-2.5 py-0.5 text-[10px] font-black text-white uppercase shadow-xs">High</span>;
       case 'MEDIUM':
-        return <span className="rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800 dark:bg-amber-950 dark:text-amber-300 uppercase">Medium</span>;
+        return <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold text-amber-800 dark:bg-amber-950 dark:text-amber-300 uppercase">Medium</span>;
       case 'LOW':
-        return <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300 uppercase">Low</span>;
+        return <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300 uppercase">Low</span>;
     }
   };
 
@@ -91,12 +94,19 @@ export const Incidents: React.FC = () => {
       header: 'Incident Code',
       sortable: true,
       render: (row) => (
-        <div className="flex flex-col">
-          <span className="font-mono font-bold text-slate-900 dark:text-white">{row.incidentCode}</span>
+        <button
+          type="button"
+          onClick={() => setViewDetailIncident(row)}
+          className="flex flex-col text-left group cursor-pointer"
+          title="Click to view full incident details"
+        >
+          <span className="font-mono font-bold text-slate-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition">
+            {row.incidentCode}
+          </span>
           <span className="text-[10px] text-slate-400">
             {new Date(row.reportedAt).toLocaleDateString()}
           </span>
-        </div>
+        </button>
       ),
     },
     {
@@ -104,27 +114,26 @@ export const Incidents: React.FC = () => {
       header: 'Incident Title & Category',
       sortable: true,
       render: (row) => (
-        <div className="flex flex-col">
-          <div className="flex items-center space-x-2">
-            <span className="font-bold text-xs text-slate-900 dark:text-white">{row.title}</span>
-            {getSeverityBadge(row.severity)}
-          </div>
-          <span className="text-[11px] text-slate-500 truncate max-w-sm">{row.description}</span>
-        </div>
+        <button
+          type="button"
+          onClick={() => setViewDetailIncident(row)}
+          className="flex items-center space-x-2 text-left group cursor-pointer"
+          title="Click to view full incident details"
+        >
+          <span className="font-bold text-xs text-slate-900 group-hover:text-brand-600 dark:text-white dark:group-hover:text-brand-400 transition">
+            {row.title}
+          </span>
+          {getSeverityBadge(row.severity)}
+        </button>
       ),
     },
     {
       key: 'locationLandmark',
-      header: 'Location & Corridor',
+      header: 'Location',
       render: (row) => (
-        <div className="flex flex-col text-xs">
-          <span className="flex items-center space-x-1 font-semibold text-slate-800 dark:text-slate-200">
-            <MapPin className="h-3 w-3 text-rose-500 flex-shrink-0" />
-            <span className="truncate max-w-[160px]">{row.locationLandmark}</span>
-          </span>
-          <span className="text-[10px] text-slate-400">
-            Route: {row.routeCode || 'City Network'} {row.plateNumber && `• ${row.plateNumber}`}
-          </span>
+        <div className="flex items-center space-x-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200">
+          <MapPin className="h-3.5 w-3.5 text-rose-500 shrink-0" />
+          <span className="truncate max-w-[240px]">{row.locationLandmark}</span>
         </div>
       ),
     },
@@ -156,7 +165,7 @@ export const Incidents: React.FC = () => {
           {row.status === 'REPORTED' && (
             <button
               onClick={() => setStatusConfirmIncident({ incident: row, newStatus: 'INVESTIGATING' })}
-              className="rounded-lg bg-amber-600 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-amber-700 transition"
+              className="rounded-full bg-amber-600 hover:bg-amber-700 px-3.5 py-1 text-[11px] font-bold text-white shadow-xs transition active:scale-95 cursor-pointer"
             >
               Investigate
             </button>
@@ -164,7 +173,7 @@ export const Incidents: React.FC = () => {
           {row.status === 'INVESTIGATING' && (
             <button
               onClick={() => setStatusConfirmIncident({ incident: row, newStatus: 'ACTION_TAKEN' })}
-              className="rounded-lg bg-blue-600 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-blue-700 transition"
+              className="rounded-full bg-blue-600 hover:bg-blue-700 px-3.5 py-1 text-[11px] font-bold text-white shadow-xs transition active:scale-95 cursor-pointer"
             >
               Take Action
             </button>
@@ -172,14 +181,14 @@ export const Incidents: React.FC = () => {
           {row.status === 'ACTION_TAKEN' && (
             <button
               onClick={() => setStatusConfirmIncident({ incident: row, newStatus: 'RESOLVED' })}
-              className="rounded-lg bg-emerald-600 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-emerald-700 transition"
+              className="rounded-full bg-emerald-600 hover:bg-emerald-700 px-3.5 py-1 text-[11px] font-bold text-white shadow-xs transition active:scale-95 cursor-pointer"
             >
               Resolve
             </button>
           )}
           <button
             onClick={() => handleOpenEdit(row)}
-            className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"
+            className="h-8 w-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition active:scale-95 cursor-pointer"
             title="Edit Incident Report"
           >
             <Edit2 className="h-4 w-4" />
@@ -197,8 +206,10 @@ export const Incidents: React.FC = () => {
       {/* Header & File Action */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <div className="flex items-center space-x-2">
-            <AlertTriangle className="h-6 w-6 text-brand-700 dark:text-brand-400" />
+          <div className="flex items-center space-x-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+              <AlertTriangle className="h-5 w-5" />
+            </div>
             <h1 className="text-2xl font-extrabold tracking-tight text-occ-text dark:text-white">
               Incident Management Desk
             </h1>
@@ -210,7 +221,7 @@ export const Incidents: React.FC = () => {
 
         <button
           onClick={handleOpenCreate}
-          className="inline-flex items-center space-x-2 rounded-xl bg-brand-700 px-4 py-2 text-xs font-bold text-white shadow-md transition hover:bg-brand-800"
+          className="inline-flex items-center space-x-2 rounded-full bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-500/25 transition-all hover:bg-blue-700 active:scale-95"
         >
           <Plus className="h-4 w-4" />
           <span>File Incident Report</span>
@@ -218,35 +229,43 @@ export const Incidents: React.FC = () => {
       </div>
 
       {/* Metrics Summary Strip */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-occ-darkCard">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase">Total Logged Incidents</span>
-          <p className="mt-1 text-2xl font-black text-slate-900 dark:text-white">{totalIncidents}</p>
-        </div>
-        <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 shadow-sm dark:border-amber-950 dark:bg-amber-950/20">
-          <span className="text-[11px] font-semibold text-amber-700 uppercase dark:text-amber-400">Active / Under Action</span>
-          <p className="mt-1 text-2xl font-black text-amber-800 dark:text-amber-300">{activeIncidents}</p>
-        </div>
-        <div className="rounded-xl border border-rose-200 bg-rose-50/50 p-4 shadow-sm dark:border-rose-950 dark:bg-rose-950/20">
-          <span className="text-[11px] font-semibold text-rose-700 uppercase dark:text-rose-400">High / Critical Priority</span>
-          <p className="mt-1 text-2xl font-black text-rose-800 dark:text-rose-300">{criticalCount}</p>
-        </div>
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 shadow-sm dark:border-emerald-950 dark:bg-emerald-950/20">
-          <span className="text-[11px] font-semibold text-emerald-700 uppercase dark:text-emerald-400">Resolved Today</span>
-          <p className="mt-1 text-2xl font-black text-emerald-800 dark:text-emerald-300">{resolvedCount}</p>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <KPICard
+          title="TOTAL LOGGED INCIDENTS"
+          value={totalIncidents}
+          status="dark"
+          icon={Shield}
+        />
+        <KPICard
+          title="ACTIVE / IN PROGRESS"
+          value={activeIncidents}
+          status="orange"
+          icon={Clock}
+        />
+        <KPICard
+          title="HIGH / CRITICAL PRIORITY"
+          value={criticalCount}
+          status="danger"
+          icon={Flame}
+        />
+        <KPICard
+          title="RESOLVED TODAY"
+          value={resolvedCount}
+          status="teal"
+          icon={CheckCircle2}
+        />
       </div>
 
       {/* Status Filter Tabs */}
-      <div className="flex items-center space-x-2 overflow-x-auto pb-1">
+      <div className="inline-flex max-w-full overflow-x-auto items-center gap-1.5 p-1 rounded-full bg-slate-100/90 border border-slate-200/80 shadow-xs dark:bg-slate-800/90 dark:border-slate-700/80 backdrop-blur-md">
         {['ALL', 'REPORTED', 'INVESTIGATING', 'ACTION_TAKEN', 'RESOLVED'].map((filter) => (
           <button
             key={filter}
             onClick={() => setStatusFilter(filter)}
-            className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+            className={`rounded-full px-4 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
               statusFilter === filter
-                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-800 dark:bg-occ-darkCard dark:text-slate-300'
+                ? 'bg-white text-slate-900 shadow-sm shadow-slate-900/5 dark:bg-slate-700 dark:text-white'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50 dark:text-slate-400 dark:hover:text-white'
             }`}
           >
             {filter.replace(/_/g, ' ')}
@@ -268,8 +287,7 @@ export const Incidents: React.FC = () => {
         isOpen={formModalOpen}
         onClose={() => setFormModalOpen(false)}
         title={selectedIncident ? `Edit Incident: ${selectedIncident.incidentCode}` : 'File Operational Incident Report'}
-        description="Provide details, severity level, affected transit lines, and resolution instructions."
-        size="lg"
+        size="xl"
       >
         <IncidentForm
           initialData={selectedIncident}
@@ -297,6 +315,14 @@ export const Incidents: React.FC = () => {
         variant={statusConfirmIncident?.newStatus === 'RESOLVED' ? 'success' : 'primary'}
         onConfirm={handleExecuteStatusChange}
         onCancel={() => setStatusConfirmIncident(null)}
+      />
+
+      {/* Incident Detail Popup Modal */}
+      <IncidentDetailModal
+        incident={viewDetailIncident}
+        isOpen={Boolean(viewDetailIncident)}
+        onClose={() => setViewDetailIncident(null)}
+        onEdit={handleOpenEdit}
       />
     </div>
   );

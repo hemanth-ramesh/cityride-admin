@@ -11,8 +11,10 @@ export const DriverMessagingPage: React.FC = () => {
 
       {/* Header */}
       <div>
-        <div className="flex items-center space-x-2">
-          <MessageSquare className="h-6 w-6 text-brand-700 dark:text-brand-400" />
+        <div className="flex items-center space-x-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+            <MessageSquare className="h-5 w-5" />
+          </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-occ-text dark:text-white">
             Driver Terminal Communicator & Broadcast
           </h1>

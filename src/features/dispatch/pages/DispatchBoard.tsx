@@ -71,8 +71,10 @@ export const DispatchBoard: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <div className="flex items-center space-x-2">
-            <GanttChartSquare className="h-6 w-6 text-brand-700 dark:text-brand-400" />
+          <div className="flex items-center space-x-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+              <GanttChartSquare className="h-5 w-5" />
+            </div>
             <h1 className="text-2xl font-extrabold tracking-tight text-occ-text dark:text-white">
               Today's Live Dispatch Board
             </h1>
@@ -83,7 +85,7 @@ export const DispatchBoard: React.FC = () => {
         </div>
 
         {/* Search & Filter */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2.5">
           <div className="relative w-48 sm:w-64">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
             <input
@@ -91,14 +93,14 @@ export const DispatchBoard: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search plate, driver..."
-              className="w-full rounded-xl border border-slate-300 bg-white py-1.5 pl-8 pr-3 text-xs text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none dark:border-slate-700 dark:bg-occ-darkCard dark:text-white"
+              className="w-full rounded-full border border-slate-200/80 bg-slate-100/80 py-2 pl-9 pr-4 text-xs font-medium text-slate-900 shadow-xs focus:bg-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800/80 dark:text-white dark:focus:bg-slate-800"
             />
           </div>
 
           <select
             value={routeFilter}
             onChange={(e) => setRouteFilter(e.target.value)}
-            className="rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm dark:border-slate-700 dark:bg-occ-darkCard dark:text-slate-200"
+            className="rounded-full border border-slate-200/80 bg-slate-100/80 px-4 py-2 text-xs font-bold text-slate-700 shadow-xs focus:bg-white focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200"
           >
             <option value="ALL">All Routes</option>
             <option value="R01">Route R01</option>
@@ -111,12 +113,12 @@ export const DispatchBoard: React.FC = () => {
       </div>
 
       {/* Timeline Gantt / Operations Stack */}
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-occ-darkCard">
+      <div className="rounded-3xl border border-slate-200/80 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:border-slate-800 dark:bg-occ-darkCard">
         {/* Board Header Bar */}
-        <div className="flex items-center justify-between border-b border-slate-200 p-4 dark:border-slate-800">
+        <div className="flex items-center justify-between border-b border-slate-100/80 p-5 dark:border-slate-800/80">
           <div className="flex items-center space-x-3">
             <span className="flex h-2.5 w-2.5 animate-ping rounded-full bg-emerald-500" />
-            <span className="text-xs font-black tracking-wider text-slate-900 uppercase dark:text-white">
+            <span className="text-xs font-bold tracking-wider text-slate-900 uppercase dark:text-white">
               Active Dispatch Stream ({filteredTrips.length} scheduled lines)
             </span>
           </div>
@@ -138,7 +140,7 @@ export const DispatchBoard: React.FC = () => {
         </div>
 
         {/* Timeline Items Stack */}
-        <div className="divide-y divide-slate-100 p-2 dark:divide-slate-800/80">
+        <div className="divide-y divide-slate-100/80 p-3 dark:divide-slate-800/80">
           {filteredTrips.map((trip) => {
             const isDelayed = trip.delayMinutes > 2 || trip.status === 'delayed';
             const progress =
@@ -153,11 +155,11 @@ export const DispatchBoard: React.FC = () => {
             return (
               <div
                 key={trip.id}
-                className="group flex flex-col justify-between gap-3 rounded-xl p-3.5 transition hover:bg-slate-50/80 dark:hover:bg-slate-800/40 sm:flex-row sm:items-center"
+                className="group flex flex-col justify-between gap-3 rounded-2xl p-4 transition hover:bg-slate-50/90 dark:hover:bg-slate-800/50 sm:flex-row sm:items-center"
               >
                 {/* Left: Trip Info */}
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-800 font-bold dark:bg-brand-950 dark:text-brand-300">
+                <div className="flex items-center space-x-3.5">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-700 font-bold dark:bg-blue-950 dark:text-blue-300">
                     {trip.routeCode}
                   </div>
 
@@ -166,7 +168,7 @@ export const DispatchBoard: React.FC = () => {
                       <span className="font-mono text-xs font-black text-slate-900 dark:text-white">
                         {trip.tripCode}
                       </span>
-                      <span className="text-xs font-bold text-brand-700 dark:text-brand-400">
+                      <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
                         {trip.plateNumber}
                       </span>
                       <StatusBadge status={trip.status} size="sm" pulse={trip.status === 'active'} />
@@ -210,7 +212,7 @@ export const DispatchBoard: React.FC = () => {
                   {/* Progress Bar */}
                   <div className="mt-2 h-1.5 w-48 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                     <div
-                      className={`h-full transition-all duration-500 ${
+                      className={`h-full transition-all duration-500 rounded-full ${
                         trip.status === 'completed'
                           ? 'bg-blue-500'
                           : isDelayed
@@ -227,7 +229,7 @@ export const DispatchBoard: React.FC = () => {
                   {trip.status === 'scheduled' || trip.status === 'ready' ? (
                     <button
                       onClick={() => handleQuickDispatch(trip)}
-                      className="inline-flex items-center space-x-1 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700"
+                      className="inline-flex items-center space-x-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 px-4 py-1.5 text-xs font-bold text-white shadow-xs transition active:scale-95"
                     >
                       <Play className="h-3.5 w-3.5" />
                       <span>Dispatch Bus</span>
@@ -235,7 +237,7 @@ export const DispatchBoard: React.FC = () => {
                   ) : trip.status === 'active' ? (
                     <button
                       onClick={() => handleQuickComplete(trip)}
-                      className="inline-flex items-center space-x-1 rounded-xl bg-blue-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm transition hover:bg-blue-700"
+                      className="inline-flex items-center space-x-1.5 rounded-full bg-blue-600 hover:bg-blue-700 px-4 py-1.5 text-xs font-bold text-white shadow-xs transition active:scale-95"
                     >
                       <CheckCircle2 className="h-3.5 w-3.5" />
                       <span>Complete Trip</span>

@@ -1,28 +1,25 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuthStore, MOCK_ADMIN_USERS } from '@/stores/useAuthStore';
-import { AdminRole } from '@/types/auth';
-import { ROLE_LABELS, ROLE_BADGE_STYLES } from '@/utils/rbac';
-import { FormField } from '@/components/ui/FormField';
-import { isSupabaseConfigured } from '@/lib/supabase';
+import { useAuthStore } from '@/stores/useAuthStore';
 import {
   Bus,
-  ShieldCheck,
   Lock,
   Mail,
   ArrowRight,
   AlertCircle,
   Radio,
-  Sparkles,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, demoLogin, isLoading, error, clearError } = useAuthStore();
+  const { login, isLoading, error, clearError } = useAuthStore();
 
-  const [email, setEmail] = useState('operations@cityride.tumakuru.gov.in');
-  const [password, setPassword] = useState('TransitAdmin@2026');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const from = (location.state as any)?.from?.pathname || '/dashboard';
 
@@ -33,11 +30,6 @@ export const Login: React.FC = () => {
     if (success) {
       navigate(from, { replace: true });
     }
-  };
-
-  const handleDemoRoleLogin = (role: AdminRole) => {
-    demoLogin(role);
-    navigate(from, { replace: true });
   };
 
   return (
@@ -75,33 +67,15 @@ export const Login: React.FC = () => {
             Centralized operations monitoring connecting passenger telemetry, driver duties, 
             36 verified smart stops, 8 active bus corridors, and instant emergency response.
           </p>
-
-          <div className="grid grid-cols-3 gap-4 border-t border-slate-800 pt-6">
-            <div>
-              <p className="text-2xl font-black text-white">36</p>
-              <p className="text-xs font-medium text-slate-400">Verified Bus Stops</p>
-            </div>
-            <div>
-              <p className="text-2xl font-black text-white">8</p>
-              <p className="text-xs font-medium text-slate-400">Transit Corridors</p>
-            </div>
-            <div>
-              <p className="text-2xl font-black text-emerald-400">2.5s</p>
-              <p className="text-xs font-medium text-slate-400">GPS Refresh Rate</p>
-            </div>
-          </div>
         </div>
 
-        {/* Footer Security Note */}
-        <div className="relative z-10 flex items-center space-x-2 text-xs text-slate-400">
-          <ShieldCheck className="h-4 w-4 text-brand-400" />
-          <span>Restricted Government Transit Operations Access • Auth Protected</span>
-        </div>
+        {/* Left Footer Spacer */}
+        <div className="relative z-10" />
       </div>
 
-      {/* Right: Login Form & Role Quick-Select */}
+      {/* Right: Clean Sign In Form */}
       <div className="flex w-full flex-col justify-center px-6 py-12 sm:px-12 lg:w-1/2 lg:px-16 xl:px-24">
-        <div className="mx-auto w-full max-w-md space-y-8">
+        <div className="mx-auto w-full max-w-md space-y-6">
           {/* Form Header */}
           <div>
             <div className="flex items-center space-x-2 lg:hidden">
@@ -110,11 +84,11 @@ export const Login: React.FC = () => {
               </div>
               <span className="text-lg font-black tracking-tight text-white">CITYRIDE OCC</span>
             </div>
-            <h2 className="mt-4 text-2xl font-bold tracking-tight text-white sm:text-3xl">
-              Sign In to OCC
+            <h2 className="mt-4 text-3xl font-bold tracking-tight text-white">
+              Sign In
             </h2>
             <p className="mt-2 text-xs text-slate-400">
-              Enter your transit officer credentials to access the operations console.
+              Enter transit administrator credentials to access the operations control center.
             </p>
           </div>
 
@@ -126,79 +100,80 @@ export const Login: React.FC = () => {
             </div>
           )}
 
-          {/* Form */}
+          {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            <FormField
-              label="Email Address"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="officer@cityride.tumakuru.gov.in"
-              icon={Mail}
-              className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 focus:border-brand-500"
-            />
+            {/* Email Field */}
+            <div>
+              <label
+                htmlFor="admin-email"
+                className="mb-1.5 block text-xs font-semibold text-slate-200"
+              >
+                Admin Email Address <span className="text-red-400">*</span>
+              </label>
+              <div className="relative flex items-center">
+                <Mail className="pointer-events-none absolute left-3.5 h-4 w-4 text-slate-400" />
+                <input
+                  id="admin-email"
+                  name="email"
+                  type="email"
+                  autoComplete="username"
+                  required
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (error) clearError();
+                  }}
+                  placeholder="admin@cityride.tumakuru.gov.in"
+                  className="w-full rounded-xl border border-slate-700 bg-slate-900 pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition"
+                />
+              </div>
+            </div>
 
-            <FormField
-              label="Password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••••••"
-              icon={Lock}
-              className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 focus:border-brand-500"
-            />
+            {/* Password Field with Eye Toggle */}
+            <div>
+              <label
+                htmlFor="admin-password"
+                className="mb-1.5 block text-xs font-semibold text-slate-200"
+              >
+                Admin Password <span className="text-red-400">*</span>
+              </label>
+              <div className="relative flex items-center">
+                <Lock className="pointer-events-none absolute left-3.5 h-4 w-4 text-slate-400" />
+                <input
+                  id="admin-password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (error) clearError();
+                  }}
+                  placeholder="Enter password..."
+                  className="w-full rounded-xl border border-slate-700 bg-slate-900 pl-10 pr-10 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 p-1 text-slate-400 hover:text-slate-200 transition focus:outline-none"
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="flex w-full items-center justify-center space-x-2 rounded-xl bg-brand-600 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 disabled:opacity-50"
+              className="flex w-full items-center justify-center space-x-2 rounded-xl bg-brand-600 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 disabled:opacity-50"
             >
               <span>{isLoading ? 'Authenticating...' : 'Sign In to Operations Console'}</span>
               <ArrowRight className="h-4 w-4" />
             </button>
           </form>
-
-          {/* RBAC 1-Click Role Switcher Demo Cards */}
-          <div className="space-y-3 border-t border-slate-800 pt-6">
-            <div className="flex items-center justify-between">
-              <span className="flex items-center space-x-1.5 text-xs font-semibold text-slate-300">
-                <Sparkles className="h-3.5 w-3.5 text-brand-400" />
-                <span>Quick Role Demo (Test All 6 RBAC Roles)</span>
-              </span>
-              <span className="text-[10px] text-slate-500">1-Click Login</span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {(Object.keys(MOCK_ADMIN_USERS) as AdminRole[]).map((r) => {
-                const style = ROLE_BADGE_STYLES[r];
-                return (
-                  <button
-                    key={r}
-                    type="button"
-                    onClick={() => handleDemoRoleLogin(r)}
-                    className="flex flex-col items-start rounded-xl border border-slate-800 bg-slate-900/80 p-2.5 text-left transition hover:border-brand-500/50 hover:bg-slate-800/80"
-                  >
-                    <span className="text-xs font-bold text-slate-200">
-                      {ROLE_LABELS[r].split(' ')[0]}
-                    </span>
-                    <span className="text-[10px] text-slate-400 truncate w-full">
-                      {MOCK_ADMIN_USERS[r].fullName.split(' ')[0]}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Backend Status Flag */}
-          <div className="flex items-center justify-between text-[11px] text-slate-500">
-            <span>Supabase Connection:</span>
-            <span className={isSupabaseConfigured ? 'font-semibold text-emerald-400' : 'text-slate-400'}>
-              {isSupabaseConfigured ? '🟢 Connected' : '⚪ Demo / Mock Fallback'}
-            </span>
-          </div>
         </div>
       </div>
     </div>

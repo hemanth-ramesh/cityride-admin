@@ -26,13 +26,13 @@ export const PROPULSION_DISTRIBUTION_DATA: PropulsionDistributionStat[] = [
 ];
 
 export const DAILY_FLEET_DISTANCE_DATA: DailyFleetDistanceStat[] = [
-  { day: 'Mon (18 Aug)', totalKm: 1420, evKm: 680, dieselKm: 740 },
-  { day: 'Tue (19 Aug)', totalKm: 1460, evKm: 710, dieselKm: 750 },
-  { day: 'Wed (20 Aug)', totalKm: 1390, evKm: 660, dieselKm: 730 },
-  { day: 'Thu (21 Aug)', totalKm: 1490, evKm: 740, dieselKm: 750 },
-  { day: 'Fri (22 Aug)', totalKm: 1540, evKm: 780, dieselKm: 760 },
-  { day: 'Sat (23 Aug)', totalKm: 1610, evKm: 810, dieselKm: 800 },
-  { day: 'Sun (24 Aug)', totalKm: 1350, evKm: 650, dieselKm: 700 },
+  { day: 'Mon (18 Aug)', totalKm: 1420, peakHoursKm: 860, offPeakKm: 560 },
+  { day: 'Tue (19 Aug)', totalKm: 1460, peakHoursKm: 890, offPeakKm: 570 },
+  { day: 'Wed (20 Aug)', totalKm: 1390, peakHoursKm: 840, offPeakKm: 550 },
+  { day: 'Thu (21 Aug)', totalKm: 1490, peakHoursKm: 910, offPeakKm: 580 },
+  { day: 'Fri (22 Aug)', totalKm: 1540, peakHoursKm: 940, offPeakKm: 600 },
+  { day: 'Sat (23 Aug)', totalKm: 1610, peakHoursKm: 980, offPeakKm: 630 },
+  { day: 'Sun (24 Aug)', totalKm: 1350, peakHoursKm: 780, offPeakKm: 570 },
 ];
 
 // ==========================================

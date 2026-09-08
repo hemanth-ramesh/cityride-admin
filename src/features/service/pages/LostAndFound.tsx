@@ -3,6 +3,7 @@ import { useLostAndFound } from '@/hooks/useServiceOperations';
 import { LostAndFoundItem, LostItemStatus } from '@/types/service';
 import { DataTable } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { KPICard } from '@/components/ui/KPICard';
 import { Modal } from '@/components/ui/Modal';
 import { LostItemForm } from '../components/LostItemForm';
 import { LostItemClaimModal } from '../components/LostItemClaimModal';
@@ -18,6 +19,16 @@ import {
   ShieldCheck,
   Filter,
 } from 'lucide-react';
+
+const CATEGORY_LABELS: Record<string, string> = {
+  ELECTRONICS_AND_PHONES: 'Electronics & Mobile Phones',
+  BAGS_AND_WALLETS: 'Bags, Backpacks & Wallets',
+  DOCUMENTS_AND_CARDS: 'Official Documents & ID Cards',
+  KEYS: 'Keys & Keychains',
+  CLOTHING_AND_APPAREL: 'Clothing & Apparel',
+  BOOKS_AND_STATIONERY: 'Books & Stationery',
+  OTHER: 'Other Items',
+};
 
 export const LostAndFound: React.FC = () => {
   const { lostItems, isLoading, createLostItem, claimAndReturn } = useLostAndFound();
@@ -65,19 +76,13 @@ export const LostAndFound: React.FC = () => {
       ),
     },
     {
-      key: 'itemName',
-      header: 'Item Description & Category',
+      key: 'category',
+      header: 'Category',
       sortable: true,
       render: (row) => (
-        <div className="flex flex-col">
-          <div className="flex items-center space-x-2">
-            <span className="font-bold text-xs text-slate-900 dark:text-white">{row.itemName}</span>
-            <span className="rounded bg-slate-100 px-1.5 py-0.2 text-[9px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-              {row.category.replace(/_/g, ' ')}
-            </span>
-          </div>
-          <span className="text-[11px] text-slate-500 truncate max-w-sm">{row.description}</span>
-        </div>
+        <span className="font-semibold text-xs text-slate-900 dark:text-white">
+          {CATEGORY_LABELS[row.category] || row.category.replace(/_/g, ' ')}
+        </span>
       ),
     },
     {
@@ -87,7 +92,7 @@ export const LostAndFound: React.FC = () => {
         <div className="flex flex-col text-xs">
           <span className="font-medium text-slate-800 dark:text-slate-200">{row.custodyDepot}</span>
           <span className="text-[10px] text-slate-400">
-            Found on {row.foundOnRouteCode || 'Route R01'} ({row.foundOnVehiclePlate || 'Fleet Bus'})
+            Found on {row.foundOnRouteCode || 'Route R01'} ({row.foundOnVehiclePlate || 'Transit Bus'})
           </span>
         </div>
       ),
@@ -112,7 +117,7 @@ export const LostAndFound: React.FC = () => {
           {row.status !== 'RETURNED' ? (
             <button
               onClick={() => setClaimingItem(row)}
-              className="inline-flex items-center space-x-1 rounded-lg bg-brand-700 px-2.5 py-1 text-xs font-bold text-white hover:bg-brand-800"
+              className="inline-flex items-center space-x-1.5 rounded-full bg-blue-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm shadow-blue-500/20 hover:bg-blue-700 active:scale-95 transition-all"
             >
               <CheckCircle2 className="h-3.5 w-3.5" />
               <span>Verify & Return</span>
@@ -134,21 +139,23 @@ export const LostAndFound: React.FC = () => {
 
       {/* Header & Log Action */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <div className="flex items-center space-x-2">
-            <PackageSearch className="h-6 w-6 text-brand-700 dark:text-brand-400" />
-            <h1 className="text-2xl font-extrabold tracking-tight text-occ-text dark:text-white">
-              Lost & Found Custody Operations
-            </h1>
+        <div className="flex items-center space-x-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 shadow-xs">
+            <PackageSearch className="h-6 w-6" />
           </div>
-          <p className="mt-1 text-xs text-occ-muted dark:text-slate-400">
-            Administrative locker registry: secure vetting, passenger claimant verification, and signed release receipts.
-          </p>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+              Lost & Found Custody
+            </h1>
+            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+              Administrative locker registry: secure vetting, passenger claimant verification, and release receipts.
+            </p>
+          </div>
         </div>
 
         <button
           onClick={() => setFormModalOpen(true)}
-          className="inline-flex items-center space-x-2 rounded-xl bg-brand-700 px-4 py-2 text-xs font-bold text-white shadow-md transition hover:bg-brand-800"
+          className="inline-flex items-center space-x-2 rounded-full bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-500/25 transition-all hover:bg-blue-700 active:scale-95"
         >
           <Plus className="h-4 w-4" />
           <span>Log Found Item</span>
@@ -156,31 +163,37 @@ export const LostAndFound: React.FC = () => {
       </div>
 
       {/* Metrics Summary Strip */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-occ-darkCard">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase">Total Items Registered</span>
-          <p className="mt-1 text-2xl font-black text-slate-900 dark:text-white">{totalItems}</p>
-        </div>
-        <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 shadow-sm dark:border-amber-950 dark:bg-amber-950/20">
-          <span className="text-[11px] font-semibold text-amber-700 uppercase dark:text-amber-400">In Depot Custody</span>
-          <p className="mt-1 text-2xl font-black text-amber-800 dark:text-amber-300">{inCustodyCount}</p>
-        </div>
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 shadow-sm dark:border-emerald-950 dark:bg-emerald-950/20">
-          <span className="text-[11px] font-semibold text-emerald-700 uppercase dark:text-emerald-400">Returned to Passengers</span>
-          <p className="mt-1 text-2xl font-black text-emerald-800 dark:text-emerald-300">{returnedCount}</p>
-        </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <KPICard
+          title="TOTAL ITEMS REGISTERED"
+          value={totalItems}
+          status="info"
+          icon={PackageSearch}
+        />
+        <KPICard
+          title="IN DEPOT CUSTODY"
+          value={inCustodyCount}
+          status="warning"
+          icon={Building2}
+        />
+        <KPICard
+          title="RETURNED TO PASSENGERS"
+          value={returnedCount}
+          status="teal"
+          icon={CheckCircle2}
+        />
       </div>
 
-      {/* Status Filter Tabs */}
-      <div className="flex items-center space-x-2 overflow-x-auto pb-1">
+      {/* Status Filter Tabs - iOS Segmented Control */}
+      <div className="inline-flex max-w-full overflow-x-auto items-center gap-1.5 p-1 rounded-full bg-slate-100/90 border border-slate-200/80 shadow-xs dark:bg-slate-800/90 dark:border-slate-700/80 backdrop-blur-md">
         {['ALL', 'FOUND_IN_CUSTODY', 'VERIFIED', 'RETURNED'].map((filter) => (
           <button
             key={filter}
             onClick={() => setStatusFilter(filter)}
-            className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+            className={`rounded-full px-4 py-1.5 text-xs font-semibold whitespace-nowrap active:scale-95 transition-all ${
               statusFilter === filter
-                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-800 dark:bg-occ-darkCard dark:text-slate-300'
+                ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
+                : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             {filter.replace(/_/g, ' ')}
@@ -202,7 +215,6 @@ export const LostAndFound: React.FC = () => {
         isOpen={formModalOpen}
         onClose={() => setFormModalOpen(false)}
         title="Log Found Transit Item into Custody"
-        description="Record item category, description, discovery bus, and depot safe location."
         size="lg"
       >
         <LostItemForm
@@ -217,7 +229,6 @@ export const LostAndFound: React.FC = () => {
         isOpen={Boolean(claimingItem)}
         onClose={() => setClaimingItem(null)}
         title="Claimant Verification & Hand-off Receipt"
-        description="Verify passenger identity proof and issue custody release voucher."
         size="md"
       >
         {claimingItem && (

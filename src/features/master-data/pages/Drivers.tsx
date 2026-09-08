@@ -6,6 +6,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Modal } from '@/components/ui/Modal';
 import { DriverForm } from '../components/DriverForm';
 import { TableColumn } from '@/types';
+import { KPICard } from '@/components/ui/KPICard';
 import {
   Users,
   UserPlus,
@@ -73,7 +74,7 @@ export const Drivers: React.FC = () => {
       sortable: true,
       render: (row) => (
         <div className="flex items-center space-x-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-100 font-bold text-brand-800 dark:bg-brand-950 dark:text-brand-300">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 font-bold text-blue-700 border border-blue-200/60 dark:from-blue-950 dark:to-indigo-950 dark:text-blue-300 dark:border-blue-800/60">
             {row.fullName.charAt(0)}
           </div>
           <div>
@@ -110,7 +111,7 @@ export const Drivers: React.FC = () => {
         <div className="flex flex-col text-xs">
           {row.assignedPlateNumber ? (
             <>
-              <span className="font-semibold text-brand-700 dark:text-brand-400">
+              <span className="font-semibold text-blue-600 dark:text-blue-400">
                 {row.assignedPlateNumber}
               </span>
               <span className="text-[10px] text-slate-500">
@@ -134,11 +135,11 @@ export const Drivers: React.FC = () => {
       header: 'Actions',
       align: 'right',
       render: (row) => (
-        <div className="flex items-center justify-end space-x-1.5">
+        <div className="flex items-center justify-end space-x-1">
           <button
             onClick={() => setStatusConfirmDriver(row)}
             title={row.status === 'suspended' ? 'Activate Driver' : 'Suspend Driver'}
-            className={`rounded-lg p-1.5 transition ${
+            className={`h-8 w-8 rounded-full flex items-center justify-center transition-all active:scale-95 ${
               row.status === 'suspended'
                 ? 'text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50'
                 : 'text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/50'
@@ -148,14 +149,14 @@ export const Drivers: React.FC = () => {
           </button>
           <button
             onClick={() => handleOpenEdit(row)}
-            className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"
+            className="h-8 w-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all active:scale-95"
             title="Edit Driver Details"
           >
             <Edit2 className="h-4 w-4" />
           </button>
           <button
             onClick={() => setDeleteConfirmDriver(row)}
-            className="rounded-lg p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40"
+            className="h-8 w-8 rounded-full flex items-center justify-center text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-all active:scale-95"
             title="Delete Driver"
           >
             <Trash2 className="h-4 w-4" />
@@ -170,8 +171,10 @@ export const Drivers: React.FC = () => {
       {/* Top Header & Action */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <div className="flex items-center space-x-2">
-            <Users className="h-6 w-6 text-brand-700 dark:text-brand-400" />
+          <div className="flex items-center space-x-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+              <Users className="h-5 w-5" />
+            </div>
             <h1 className="text-2xl font-extrabold tracking-tight text-occ-text dark:text-white">
               Driver Operations Management
             </h1>
@@ -183,7 +186,7 @@ export const Drivers: React.FC = () => {
 
         <button
           onClick={handleOpenCreate}
-          className="inline-flex items-center space-x-2 rounded-xl bg-brand-700 px-4 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-brand-800"
+          className="inline-flex items-center space-x-2 rounded-full bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-500/25 transition-all hover:bg-blue-700 active:scale-95"
         >
           <UserPlus className="h-4 w-4" />
           <span>Register New Driver</span>
@@ -191,23 +194,31 @@ export const Drivers: React.FC = () => {
       </div>
 
       {/* Metrics Summary Strip */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-occ-darkCard">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase">Total Drivers</span>
-          <p className="mt-1 text-2xl font-black text-slate-900 dark:text-white">{totalDrivers}</p>
-        </div>
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 shadow-sm dark:border-emerald-950 dark:bg-emerald-950/20">
-          <span className="text-[11px] font-semibold text-emerald-700 uppercase dark:text-emerald-400">On Duty Active</span>
-          <p className="mt-1 text-2xl font-black text-emerald-800 dark:text-emerald-300">{onDutyCount}</p>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-occ-darkCard">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase">Available Reserve</span>
-          <p className="mt-1 text-2xl font-black text-slate-700 dark:text-slate-200">{activeCount}</p>
-        </div>
-        <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 shadow-sm dark:border-amber-950 dark:bg-amber-950/20">
-          <span className="text-[11px] font-semibold text-amber-700 uppercase dark:text-amber-400">Suspended / Leave</span>
-          <p className="mt-1 text-2xl font-black text-amber-800 dark:text-amber-300">{suspendedCount}</p>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <KPICard
+          title="TOTAL DRIVERS"
+          value={totalDrivers}
+          status="dark"
+          icon={Users}
+        />
+        <KPICard
+          title="ON DUTY ACTIVE"
+          value={onDutyCount}
+          status="teal"
+          icon={CheckCircle}
+        />
+        <KPICard
+          title="AVAILABLE RESERVE"
+          value={activeCount}
+          status="info"
+          icon={ShieldCheck}
+        />
+        <KPICard
+          title="SUSPENDED / LEAVE"
+          value={suspendedCount}
+          status="warning"
+          icon={ShieldAlert}
+        />
       </div>
 
       {/* Driver DataTable */}
@@ -224,7 +235,6 @@ export const Drivers: React.FC = () => {
         isOpen={formModalOpen}
         onClose={() => setFormModalOpen(false)}
         title={selectedDriver ? `Edit Driver: ${selectedDriver.fullName}` : 'Register New Driver'}
-        description="Fill in certified driver credentials and depot assignment."
         size="lg"
       >
         <DriverForm
@@ -246,13 +256,13 @@ export const Drivers: React.FC = () => {
           <>
             <button
               onClick={() => setDeleteConfirmDriver(null)}
-              className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300"
+              className="rounded-full bg-slate-100 hover:bg-slate-200 px-5 py-2 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition active:scale-95"
             >
               Cancel
             </button>
             <button
               onClick={handleDeleteConfirm}
-              className="rounded-lg bg-red-600 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-red-700"
+              className="rounded-full bg-rose-600 hover:bg-rose-700 px-5 py-2 text-xs font-bold text-white shadow-md shadow-rose-500/25 transition active:scale-95"
             >
               Delete Record
             </button>
@@ -277,16 +287,16 @@ export const Drivers: React.FC = () => {
           <>
             <button
               onClick={() => setStatusConfirmDriver(null)}
-              className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300"
+              className="rounded-full bg-slate-100 hover:bg-slate-200 px-5 py-2 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition active:scale-95"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirmStatusToggle}
-              className={`rounded-lg px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition ${
+              className={`rounded-full px-5 py-2 text-xs font-bold text-white shadow-md transition active:scale-95 ${
                 statusConfirmDriver?.status === 'suspended'
-                  ? 'bg-emerald-600 hover:bg-emerald-700'
-                  : 'bg-amber-600 hover:bg-amber-700'
+                  ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/25'
+                  : 'bg-amber-600 hover:bg-amber-700 shadow-amber-500/25'
               }`}
             >
               {statusConfirmDriver?.status === 'suspended' ? 'Activate Driver' : 'Suspend Driver'}

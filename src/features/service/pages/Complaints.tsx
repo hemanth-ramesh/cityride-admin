@@ -8,6 +8,7 @@ import { Modal } from '@/components/ui/Modal';
 import { ComplaintDetailModal } from '../components/ComplaintDetailModal';
 import { ServiceNavigationTabs } from '../components/ServiceNavigationTabs';
 import { TableColumn } from '@/types';
+import { KPICard } from '@/components/ui/KPICard';
 import {
   MessageSquareWarning,
   Eye,
@@ -76,18 +77,12 @@ export const Complaints: React.FC = () => {
     },
     {
       key: 'subject',
-      header: 'Grievance Subject & Category',
+      header: 'Subject',
       sortable: true,
       render: (row) => (
-        <div className="flex flex-col">
-          <div className="flex items-center space-x-2">
-            <span className="font-bold text-xs text-slate-900 dark:text-white">{row.subject}</span>
-            <span className="rounded bg-slate-100 px-1.5 py-0.2 text-[9px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-              {row.category.replace(/_/g, ' ')}
-            </span>
-          </div>
-          <span className="text-[11px] text-slate-500 truncate max-w-sm">{row.description}</span>
-        </div>
+        <span className="font-semibold text-xs text-slate-900 dark:text-white">
+          {row.subject}
+        </span>
       ),
     },
     {
@@ -100,15 +95,6 @@ export const Complaints: React.FC = () => {
             {row.routeCode ? `Route ${row.routeCode}` : 'General Inquiry'} • {row.passengerPhone}
           </span>
         </div>
-      ),
-    },
-    {
-      key: 'assignedOfficer',
-      header: 'Assigned Handler',
-      render: (row) => (
-        <span className="text-xs text-slate-700 dark:text-slate-300 font-medium">
-          {row.assignedOfficer || <span className="text-slate-400 italic">Unassigned</span>}
-        </span>
       ),
     },
     {
@@ -129,7 +115,7 @@ export const Complaints: React.FC = () => {
       render: (row) => (
         <button
           onClick={() => setSelectedComplaint(row)}
-          className="inline-flex items-center space-x-1 rounded-lg border border-slate-300 px-2.5 py-1 text-xs font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+          className="inline-flex items-center space-x-1.5 rounded-full bg-slate-100 hover:bg-slate-200 px-4 py-1.5 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition-all active:scale-95"
         >
           <Eye className="h-3.5 w-3.5" />
           <span>Resolve</span>
@@ -146,8 +132,10 @@ export const Complaints: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <div className="flex items-center space-x-2">
-            <MessageSquareWarning className="h-6 w-6 text-brand-700 dark:text-brand-400" />
+          <div className="flex items-center space-x-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+              <MessageSquareWarning className="h-5 w-5" />
+            </div>
             <h1 className="text-2xl font-extrabold tracking-tight text-occ-text dark:text-white">
               Grievance & Complaints Desk
             </h1>
@@ -159,35 +147,43 @@ export const Complaints: React.FC = () => {
       </div>
 
       {/* Metrics Summary Strip */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-occ-darkCard">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase">Total Logged Tickets</span>
-          <p className="mt-1 text-2xl font-black text-slate-900 dark:text-white">{totalComplaints}</p>
-        </div>
-        <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 shadow-sm dark:border-amber-950 dark:bg-amber-950/20">
-          <span className="text-[11px] font-semibold text-amber-700 uppercase dark:text-amber-400">Open / Unassigned</span>
-          <p className="mt-1 text-2xl font-black text-amber-800 dark:text-amber-300">{openCount}</p>
-        </div>
-        <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-4 shadow-sm dark:border-blue-950 dark:bg-blue-950/20">
-          <span className="text-[11px] font-semibold text-blue-700 uppercase dark:text-blue-400">In Investigation</span>
-          <p className="mt-1 text-2xl font-black text-blue-800 dark:text-blue-300">{inProgressCount}</p>
-        </div>
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 shadow-sm dark:border-emerald-950 dark:bg-emerald-950/20">
-          <span className="text-[11px] font-semibold text-emerald-700 uppercase dark:text-emerald-400">Resolved Successfully</span>
-          <p className="mt-1 text-2xl font-black text-emerald-800 dark:text-emerald-300">{resolvedCount}</p>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <KPICard
+          title="TOTAL TICKETS"
+          value={totalComplaints}
+          status="dark"
+          icon={MessageSquareWarning}
+        />
+        <KPICard
+          title="OPEN / UNASSIGNED"
+          value={openCount}
+          status="orange"
+          icon={Clock}
+        />
+        <KPICard
+          title="IN INVESTIGATION"
+          value={inProgressCount}
+          status="info"
+          icon={User}
+        />
+        <KPICard
+          title="RESOLVED SUCCESSFULLY"
+          value={resolvedCount}
+          status="teal"
+          icon={CheckCircle2}
+        />
       </div>
 
       {/* Status Filter Tabs */}
-      <div className="flex items-center space-x-2 overflow-x-auto pb-1">
+      <div className="inline-flex max-w-full overflow-x-auto items-center gap-1.5 p-1 rounded-full bg-slate-100/90 border border-slate-200/80 shadow-xs dark:bg-slate-800/90 dark:border-slate-700/80 backdrop-blur-md">
         {['ALL', 'OPEN', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED'].map((filter) => (
           <button
             key={filter}
             onClick={() => setStatusFilter(filter)}
-            className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+            className={`rounded-full px-4 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
               statusFilter === filter
-                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-800 dark:bg-occ-darkCard dark:text-slate-300'
+                ? 'bg-white text-slate-900 shadow-sm shadow-slate-900/5 dark:bg-slate-700 dark:text-white'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50 dark:text-slate-400 dark:hover:text-white'
             }`}
           >
             {filter.replace(/_/g, ' ')}
@@ -209,7 +205,7 @@ export const Complaints: React.FC = () => {
         isOpen={Boolean(selectedComplaint)}
         onClose={() => setSelectedComplaint(null)}
         title="Grievance Investigation & Redressal"
-        description="Assign depot supervisor, draft official citizen response, and close complaint ticket."
+        description="Draft official citizen response and close complaint ticket."
         size="lg"
       >
         {selectedComplaint && (

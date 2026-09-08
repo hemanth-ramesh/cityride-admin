@@ -274,6 +274,18 @@ export const LiveFleetMapComponent: React.FC<LiveFleetMapProps> = ({
     [onSelectVehicle]
   );
 
+  // Pan and focus if selectedVehicle changes from outside
+  React.useEffect(() => {
+    if (selectedVehicle) {
+      const v = normalizeVehicle(selectedVehicle);
+      setActiveInfoWindow(v);
+      if (mapRef.current) {
+        mapRef.current.panTo({ lat: v.lat, lng: v.lng });
+        mapRef.current.setZoom(15);
+      }
+    }
+  }, [selectedVehicle]);
+
   // Fallback map controls
   const handleRecenter = useCallback(() => {
     if (mapRef.current) {
@@ -308,7 +320,7 @@ export const LiveFleetMapComponent: React.FC<LiveFleetMapProps> = ({
   }
 
   return (
-    <div className={clsx('relative h-full w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-md dark:border-slate-800', className)}>
+    <div className={clsx('relative h-full w-full overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-950 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:border-slate-800', className)}>
       <GoogleMap
         mapContainerStyle={MAP_CONTAINER_STYLE}
         center={TUMAKURU_CENTER}
@@ -419,8 +431,15 @@ const InteractiveRadarMapFallback: React.FC<{
   selectedVehicle?: any;
   onSelectVehicle?: (id: string | null) => void;
   className?: string;
-}> = React.memo(({ vehicles, onSelectVehicle, className }) => {
+}> = React.memo(({ vehicles, selectedVehicle, onSelectVehicle, className }) => {
   const [selectedPin, setSelectedPin] = useState<ReturnType<typeof normalizeVehicle> | null>(null);
+
+  React.useEffect(() => {
+    if (selectedVehicle) {
+      const normalized = normalizeVehicle(selectedVehicle);
+      setSelectedPin(normalized);
+    }
+  }, [selectedVehicle]);
 
   const latToY = (lat: number) => {
     const clamped = Math.max(TUMAKURU_BOUNDS.minLat, Math.min(TUMAKURU_BOUNDS.maxLat, lat));
@@ -433,7 +452,7 @@ const InteractiveRadarMapFallback: React.FC<{
   };
 
   return (
-    <div className={clsx('relative h-full w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-md dark:border-slate-800 select-none', className)}>
+    <div className={clsx('relative h-full w-full overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-950 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:border-slate-800 select-none', className)}>
       {/* Grid Pattern */}
       <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(to_right,#38bdf8_1px,transparent_1px),linear-gradient(to_bottom,#38bdf8_1px,transparent_1px)] [background-size:32px_32px]" />
 

@@ -4,18 +4,18 @@ export const ROLE_LABELS: Record<AdminRole, string> = {
   SUPER_ADMIN: 'Super Administrator',
   OPERATIONS_MANAGER: 'Operations Manager',
   DISPATCHER: 'Dispatcher',
-  FLEET_MANAGER: 'Fleet Manager',
+  FLEET_MANAGER: 'Bus Depot Manager',
   SUPPORT_ADMIN: 'Support Admin',
   ANALYST: 'Transit Analyst',
 };
 
 export const ROLE_DESCRIPTIONS: Record<AdminRole, string> = {
   SUPER_ADMIN: 'Unrestricted full access to all control center modules, audit logs, and user roles.',
-  OPERATIONS_MANAGER: 'Manages live fleet operations, driver duties, routes, schedules, and incidents.',
+  OPERATIONS_MANAGER: 'Manages live bus operations, driver duties, routes, schedules, and incidents.',
   DISPATCHER: 'Real-time operational dispatching, active trip tracking, SOS response, and driver messaging.',
-  FLEET_MANAGER: 'Oversees vehicle telemetry, maintenance status, bus assignments, and depot assets.',
+  FLEET_MANAGER: 'Oversees bus telemetry, maintenance status, bus assignments, and depot assets.',
   SUPPORT_ADMIN: 'Manages citizen complaints, lost & found verification, and passenger communications.',
-  ANALYST: 'Read-only access to operational KPIs, route punctuality, fleet utilization, and reports.',
+  ANALYST: 'Read-only access to operational KPIs, route punctuality, bus utilization, and reports.',
 };
 
 export const ROLE_BADGE_STYLES: Record<AdminRole, { bg: string; text: string; border: string }> = {

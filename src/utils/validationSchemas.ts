@@ -37,18 +37,10 @@ export const vehicleSchema = z.object({
     .regex(/^KA\s?06\s?[A-Z]{1,2}\s?\d{4}$/i, 'Must follow Tumakuru RTO format: KA 06 XX 1234'),
   fleetNumber: z
     .string()
-    .min(2, 'Fleet unit ID required (e.g. CR-TUM-01)'),
-  fleetType: z.string().min(1, 'Please select fleet class'),
-  seatingCapacity: z
-    .number()
-    .int('Must be a whole number')
-    .min(15, 'Minimum capacity is 15 passengers')
-    .max(80, 'Maximum capacity is 80 passengers'),
-  standingCapacity: z
-    .number()
-    .int('Must be a whole number')
-    .min(0, 'Cannot be negative')
-    .max(50, 'Maximum standing capacity is 50'),
+    .min(2, 'Bus unit ID required (e.g. CR-TUM-01)'),
+  fleetType: z.string().optional(),
+  seatingCapacity: z.number().optional().default(35),
+  standingCapacity: z.number().optional().default(10),
   manufacturer: z.string().min(2, 'Manufacturer name is required'),
   modelYear: z
     .number()

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Vehicle, VehicleStatus, BusFleetType } from '@/types/masterData';
 import { FormField } from '@/components/ui/FormField';
 import { vehicleSchema } from '@/utils/validationSchemas';
-import { Bus, Hash, Layers, Users, Zap, Snowflake, Calendar, AlertCircle } from 'lucide-react';
+import { Bus, Hash, Calendar, AlertCircle } from 'lucide-react';
 
 interface VehicleFormProps {
   initialData?: Vehicle | null;
@@ -10,16 +10,6 @@ interface VehicleFormProps {
   onCancel: () => void;
   isLoading?: boolean;
 }
-
-const FLEET_TYPES: BusFleetType[] = [
-  'AC Volvo Electric',
-  'City Regular Eco',
-  'Smart Feeder Electric',
-  'Industrial Express',
-  'City Connector',
-  'Suburban Shuttle',
-  'Pilgrim Special',
-];
 
 export const VehicleForm: React.FC<VehicleFormProps> = ({
   initialData,
@@ -30,15 +20,10 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({
   const [registrationNumber, setRegistrationNumber] = useState('');
   const [fleetNumber, setFleetNumber] = useState('');
   const [fleetType, setFleetType] = useState<BusFleetType>('City Regular Eco');
-  const [capacity, setCapacity] = useState(42);
-  const [seatingCapacity, setSeatingCapacity] = useState(32);
-  const [standingCapacity, setStandingCapacity] = useState(10);
   const [status, setStatus] = useState<VehicleStatus>('active');
   const [depotId, setDepotId] = useState('DEPOT_01_CENTRAL');
-  const [isElectric, setIsElectric] = useState(false);
-  const [hasAc, setHasAc] = useState(false);
-  const [manufactureYear, setManufactureYear] = useState(2023);
-  const [nextServiceDate, setNextServiceDate] = useState('2026-10-01');
+  const [manufactureYear, setManufactureYear] = useState<number | ''>('');
+  const [nextServiceDate, setNextServiceDate] = useState('');
   const [validationError, setValidationError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -46,28 +31,17 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({
       setRegistrationNumber(initialData.registrationNumber);
       setFleetNumber(initialData.fleetNumber);
       setFleetType(initialData.fleetType);
-      setCapacity(initialData.capacity);
-      setSeatingCapacity(initialData.seatingCapacity);
-      setStandingCapacity(initialData.standingCapacity);
       setStatus(initialData.status);
       setDepotId(initialData.depotId || 'DEPOT_01_CENTRAL');
-      setIsElectric(initialData.isElectric);
-      setHasAc(initialData.hasAc);
       setManufactureYear(initialData.manufactureYear);
       setNextServiceDate(initialData.nextServiceDate);
     } else {
-      const randomId = Math.floor(10 + Math.random() * 90);
-      setRegistrationNumber(`KA 06 F ${Math.floor(1000 + Math.random() * 9000)}`);
-      setFleetNumber(`CR-TUM-${randomId}`);
+      setRegistrationNumber('');
+      setFleetNumber('');
+      setManufactureYear('');
+      setNextServiceDate('');
     }
   }, [initialData]);
-
-  // Sync Electric / AC defaults on fleet type change
-  const handleFleetTypeChange = (type: BusFleetType) => {
-    setFleetType(type);
-    if (type.includes('Electric')) setIsElectric(true);
-    if (type.includes('AC')) setHasAc(true);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,15 +52,13 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({
       registrationNumber: plateFormatted,
       fleetNumber,
       fleetType,
-      seatingCapacity: Number(seatingCapacity),
-      standingCapacity: Number(standingCapacity),
-      manufacturer: isElectric ? 'Olectra Greentech' : 'Tata Motors Transit',
+      manufacturer: 'Tata Motors Transit',
       modelYear: Number(manufactureYear),
-      fuelType: isElectric ? 'ELECTRIC' : 'DIESEL',
+      fuelType: 'DIESEL',
       depotId,
       depotName: depotId === 'DEPOT_01_CENTRAL' ? 'Tumakuru Central Depot 1' : 'Industrial Depot 2',
       status,
-      isAirConditioned: hasAc,
+      isAirConditioned: false,
       hasWheelchairRamp: true,
       hasCctv: true,
       hasPanicButtons: true,
@@ -101,14 +73,14 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({
       registrationNumber: plateFormatted,
       fleetNumber,
       fleetType,
-      capacity: Number(seatingCapacity) + Number(standingCapacity),
-      seatingCapacity: Number(seatingCapacity),
-      standingCapacity: Number(standingCapacity),
+      capacity: initialData?.capacity || 42,
+      seatingCapacity: initialData?.seatingCapacity || 32,
+      standingCapacity: initialData?.standingCapacity || 10,
       status,
       depotId,
       depotName: depotId === 'DEPOT_01_CENTRAL' ? 'Tumakuru Central Depot 1' : 'Industrial Depot 2',
-      isElectric,
-      hasAc,
+      isElectric: false,
+      hasAc: false,
       manufactureYear: Number(manufactureYear),
       nextServiceDate,
     });
@@ -122,32 +94,21 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({
           required
           value={registrationNumber}
           onChange={(e) => setRegistrationNumber(e.target.value)}
-          placeholder="KA 06 F 8558"
+          placeholder="e.g. KA 06 F 8558"
           icon={Bus}
-          helperText="Standard Karnataka transport registration format"
         />
 
         <FormField
-          label="Fleet Code / Bus Unit #"
+          label="Bus Unit #"
           required
           value={fleetNumber}
           onChange={(e) => setFleetNumber(e.target.value)}
-          placeholder="CR-TUM-01"
+          placeholder="e.g. CR-TUM-01"
           icon={Hash}
         />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <FormField
-          label="Fleet Model / Class"
-          as="select"
-          required
-          value={fleetType}
-          onChange={(e) => handleFleetTypeChange(e.target.value as BusFleetType)}
-          options={FLEET_TYPES.map((t) => ({ label: t, value: t }))}
-          icon={Layers}
-        />
-
         <FormField
           label="Home Depot"
           as="select"
@@ -159,41 +120,7 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({
             { label: 'Depot 2 (Melekote Industrial)', value: 'DEPOT_02_INDUSTRIAL' },
           ]}
         />
-      </div>
 
-      {/* Capacities */}
-      <div className="grid grid-cols-3 gap-3">
-        <FormField
-          label="Total Capacity"
-          type="number"
-          required
-          value={capacity}
-          onChange={(e) => {
-            const cap = Number(e.target.value);
-            setCapacity(cap);
-            setSeatingCapacity(Math.round(cap * 0.75));
-            setStandingCapacity(Math.round(cap * 0.25));
-          }}
-          icon={Users}
-        />
-
-        <FormField
-          label="Seating"
-          type="number"
-          value={seatingCapacity}
-          onChange={(e) => setSeatingCapacity(Number(e.target.value))}
-        />
-
-        <FormField
-          label="Standing"
-          type="number"
-          value={standingCapacity}
-          onChange={(e) => setStandingCapacity(Number(e.target.value))}
-        />
-      </div>
-
-      {/* Features & Status */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <FormField
           label="Operational Status"
           as="select"
@@ -206,12 +133,17 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({
             { label: 'Decommissioned', value: 'decommissioned' },
           ]}
         />
+      </div>
 
+
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           label="Year of Manufacture"
           type="number"
           value={manufactureYear}
-          onChange={(e) => setManufactureYear(Number(e.target.value))}
+          placeholder="e.g. 2024"
+          onChange={(e) => setManufactureYear(e.target.value === '' ? '' : Number(e.target.value))}
           icon={Calendar}
         />
 
@@ -221,31 +153,6 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({
           value={nextServiceDate}
           onChange={(e) => setNextServiceDate(e.target.value)}
         />
-      </div>
-
-      {/* Electric & AC Checkboxes */}
-      <div className="flex items-center space-x-6 rounded-xl border border-slate-200 bg-slate-50/50 p-3.5 dark:border-slate-800 dark:bg-slate-900/40">
-        <label className="flex cursor-pointer items-center space-x-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
-          <input
-            type="checkbox"
-            checked={isElectric}
-            onChange={(e) => setIsElectric(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
-          />
-          <Zap className="h-4 w-4 text-emerald-500" />
-          <span>Electric Propulsion (EV)</span>
-        </label>
-
-        <label className="flex cursor-pointer items-center space-x-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
-          <input
-            type="checkbox"
-            checked={hasAc}
-            onChange={(e) => setHasAc(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-          />
-          <Snowflake className="h-4 w-4 text-blue-500" />
-          <span>Air Conditioned (AC)</span>
-        </label>
       </div>
 
       {validationError && (

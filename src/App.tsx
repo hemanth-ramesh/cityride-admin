@@ -29,9 +29,6 @@ const Stops = lazy(() =>
 const RoutesPage = lazy(() =>
   import('@/features/master-data/pages/Routes').then((m) => ({ default: m.Routes }))
 );
-const Schedules = lazy(() =>
-  import('@/features/master-data/pages/Schedules').then((m) => ({ default: m.Schedules }))
-);
 const ScheduledTrips = lazy(() =>
   import('@/features/dispatch/pages/ScheduledTrips').then((m) => ({ default: m.ScheduledTrips }))
 );
@@ -172,15 +169,6 @@ export const App: React.FC = () => {
             element={
               <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'OPERATIONS_MANAGER']}>
                 <Stops />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="schedules"
-            element={
-              <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'OPERATIONS_MANAGER']}>
-                <Schedules />
               </ProtectedRoute>
             }
           />

@@ -51,7 +51,7 @@ export const TripHistory: React.FC = () => {
       sortable: true,
       render: (row) => (
         <div className="flex items-center space-x-2">
-          <span className="rounded bg-brand-100 px-2 py-0.5 font-mono text-xs font-black text-brand-800 dark:bg-brand-950 dark:text-brand-300">
+          <span className="rounded-full bg-blue-50 px-2.5 py-0.5 font-mono text-xs font-bold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border border-blue-200/60">
             {row.routeCode}
           </span>
           <div className="flex flex-col text-xs">
@@ -65,10 +65,10 @@ export const TripHistory: React.FC = () => {
     },
     {
       key: 'plateNumber',
-      header: 'Vehicle & Driver',
+      header: 'Vehicle No & Driver',
       render: (row) => (
         <div className="flex flex-col text-xs">
-          <span className="font-semibold text-brand-800 dark:text-brand-300">{row.plateNumber}</span>
+          <span className="font-semibold text-slate-900 dark:text-white">{row.plateNumber}</span>
           <span className="text-[10px] text-slate-500">{row.driverName}</span>
         </div>
       ),
@@ -81,8 +81,8 @@ export const TripHistory: React.FC = () => {
           <span className="font-bold text-slate-800 dark:text-slate-200">
             {row.actualDeparture} → {row.actualArrival}
           </span>
-          <span className={`text-[10px] ${row.delayMinutes > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
-            {row.delayMinutes > 0 ? `+${row.delayMinutes}m Late` : 'On Schedule'} (Plan: {row.scheduledDeparture})
+          <span className={`text-[10px] font-semibold ${row.delayMinutes > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
+            {row.delayMinutes > 0 ? `+${row.delayMinutes}m Late` : 'On Schedule'}
           </span>
         </div>
       ),
@@ -100,9 +100,9 @@ export const TripHistory: React.FC = () => {
       render: (row) => (
         <button
           onClick={() => setSelectedTripForReplay(row)}
-          className="inline-flex items-center space-x-1.5 rounded-xl bg-brand-700 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-brand-800 transition"
+          className="inline-flex items-center space-x-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/60 px-4 py-1.5 text-xs font-bold hover:bg-blue-100 active:scale-95 transition-all dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800/60"
         >
-          <Play className="h-3 w-3" />
+          <Play className="h-3 w-3 fill-current" />
           <span>GPS Replay</span>
         </button>
       ),
@@ -116,16 +116,18 @@ export const TripHistory: React.FC = () => {
 
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <div className="flex items-center space-x-2">
-            <Navigation className="h-6 w-6 text-brand-700 dark:text-brand-400" />
-            <h1 className="text-2xl font-extrabold tracking-tight text-occ-text dark:text-white">
-              Trip History & GPS Breadcrumb Playback
-            </h1>
+        <div className="flex items-center space-x-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 shadow-xs">
+            <Navigation className="h-6 w-6" />
           </div>
-          <p className="mt-1 text-xs text-occ-muted dark:text-slate-400">
-            Query past completed transit runs, analyze schedule deviations, and replay historical GPS trajectories.
-          </p>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+              Trip History & GPS Replay
+            </h1>
+            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+              Query past completed transit runs, analyze schedule deviations, and replay historical GPS trajectories.
+            </p>
+          </div>
         </div>
 
         {/* Route Filter Dropdown */}
@@ -133,7 +135,7 @@ export const TripHistory: React.FC = () => {
           <select
             value={routeFilter}
             onChange={(e) => setRouteFilter(e.target.value)}
-            className="rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm dark:border-slate-700 dark:bg-occ-darkCard dark:text-slate-200"
+            className="rounded-full border border-slate-200/80 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-xs hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
           >
             <option value="ALL">All Route Corridors</option>
             <option value="R01">Route R01</option>

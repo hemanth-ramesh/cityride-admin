@@ -2,9 +2,13 @@ import React from 'react';
 import { clsx } from 'clsx';
 import { LucideIcon } from 'lucide-react';
 
+import { SearchableSelect } from './SearchableSelect';
+
 interface Option {
   label: string;
   value: string | number;
+  sublabel?: string;
+  badge?: string;
   disabled?: boolean;
 }
 
@@ -12,7 +16,8 @@ interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   helperText?: string;
-  as?: 'input' | 'select' | 'textarea';
+  as?: 'input' | 'select' | 'textarea' | 'search-select';
+  searchable?: boolean;
   options?: Option[];
   rows?: number;
   icon?: LucideIcon;
@@ -26,6 +31,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   error,
   helperText,
   as = 'input',
+  searchable = false,
   options = [],
   rows = 3,
   icon: Icon,
@@ -40,14 +46,40 @@ export const FormField: React.FC<FormFieldProps> = ({
 }) => {
   const generatedId = id || (label ? label.toLowerCase().replace(/[\s-]/g, '_') : undefined);
 
+  if (as === 'search-select' || (as === 'select' && searchable)) {
+    return (
+      <SearchableSelect
+        id={generatedId}
+        label={label}
+        required={required}
+        disabled={disabled}
+        error={error}
+        helperText={helperText}
+        value={props.value !== undefined ? String(props.value) : ''}
+        placeholder={props.placeholder || (label ? `Search ${label.replace(/\s*\(optional\)/i, '')}...` : 'Type to search...')}
+        options={options}
+        icon={Icon}
+        className={className}
+        containerClassName={containerClassName}
+        onChange={(val) => {
+          if (props.onChange) {
+            props.onChange({
+              target: { value: val, name: props.name || generatedId },
+            } as any);
+          }
+        }}
+      />
+    );
+  }
+
   const baseControlClasses = clsx(
-    'w-full rounded-lg border bg-white px-3.5 py-2 text-sm text-occ-text shadow-sm transition-all placeholder:text-slate-400 focus:outline-none focus:ring-2 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500',
+    'w-full rounded-2xl border bg-slate-50/60 px-4 py-2.5 text-sm text-occ-text shadow-xs transition-all placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 dark:bg-slate-900/60 dark:text-white dark:placeholder:text-slate-500',
     error
-      ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20 dark:border-red-800'
-      : 'border-slate-300 focus:border-brand-500 focus:ring-brand-500/20 dark:border-slate-700 dark:focus:border-brand-400',
+      ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-500/20 dark:border-rose-800'
+      : 'border-slate-200/80 focus:border-blue-500 focus:ring-blue-500/20 dark:border-slate-700 dark:focus:border-blue-400',
     Icon && 'pl-10',
     RightIcon && 'pr-10',
-    disabled && 'cursor-not-allowed bg-slate-50 opacity-60 dark:bg-slate-800/50',
+    disabled && 'cursor-not-allowed bg-slate-100/60 opacity-60 dark:bg-slate-800/50',
     className
   );
 

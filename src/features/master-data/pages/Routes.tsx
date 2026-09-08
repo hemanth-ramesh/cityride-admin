@@ -7,6 +7,7 @@ import { Modal } from '@/components/ui/Modal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { RouteEditor } from '../components/RouteEditor';
 import { TableColumn } from '@/types';
+import { KPICard } from '@/components/ui/KPICard';
 import {
   GitFork,
   Plus,
@@ -64,10 +65,10 @@ export const Routes: React.FC = () => {
       header: 'Route #',
       sortable: true,
       render: (row) => (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2.5">
           <span
-            style={{ backgroundColor: row.colorHex || '#059669' }}
-            className="flex h-8 w-10 items-center justify-center rounded-lg text-xs font-black text-white shadow-sm"
+            style={{ backgroundColor: row.colorHex || '#2563eb' }}
+            className="flex h-7 w-12 items-center justify-center rounded-full text-xs font-black text-white shadow-xs"
           >
             {row.routeCode}
           </span>
@@ -112,7 +113,7 @@ export const Routes: React.FC = () => {
       header: 'Frequency & Hours',
       render: (row) => (
         <div className="flex flex-col text-xs">
-          <span className="font-semibold text-brand-700 dark:text-brand-400">
+          <span className="font-semibold text-blue-600 dark:text-blue-400">
             Every {row.dailyFrequencyMinutes} mins
           </span>
           <span className="text-[10px] text-slate-400">
@@ -132,17 +133,17 @@ export const Routes: React.FC = () => {
       header: 'Actions',
       align: 'right',
       render: (row) => (
-        <div className="flex items-center justify-end space-x-1.5">
+        <div className="flex items-center justify-end space-x-1">
           <button
             onClick={() => handleOpenEdit(row)}
-            className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"
+            className="h-8 w-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all active:scale-95"
             title="Edit Route Path & Stop Sequence"
           >
             <Edit2 className="h-4 w-4" />
           </button>
           <button
             onClick={() => setDeleteConfirmRoute(row)}
-            className="rounded-lg p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40"
+            className="h-8 w-8 rounded-full flex items-center justify-center text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-all active:scale-95"
             title="Delete Route"
           >
             <Trash2 className="h-4 w-4" />
@@ -157,10 +158,12 @@ export const Routes: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <div className="flex items-center space-x-2">
-            <GitFork className="h-6 w-6 text-brand-700 dark:text-brand-400" />
+          <div className="flex items-center space-x-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+              <GitFork className="h-5 w-5" />
+            </div>
             <h1 className="text-2xl font-extrabold tracking-tight text-occ-text dark:text-white">
-              Transit Route Network (8 Corridors)
+              Transit Route Network ({totalRoutes} Corridors)
             </h1>
           </div>
           <p className="mt-1 text-xs text-occ-muted dark:text-slate-400">
@@ -170,7 +173,7 @@ export const Routes: React.FC = () => {
 
         <button
           onClick={handleOpenCreate}
-          className="inline-flex items-center space-x-2 rounded-xl bg-brand-700 px-4 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-brand-800"
+          className="inline-flex items-center space-x-2 rounded-full bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-500/25 transition-all hover:bg-blue-700 active:scale-95"
         >
           <Plus className="h-4 w-4" />
           <span>Create New Route</span>
@@ -178,19 +181,19 @@ export const Routes: React.FC = () => {
       </div>
 
       {/* Metrics Summary Strip */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-occ-darkCard">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase">Active Corridors</span>
-          <p className="mt-1 text-2xl font-black text-slate-900 dark:text-white">{totalRoutes} Routes</p>
-        </div>
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 shadow-sm dark:border-emerald-950 dark:bg-emerald-950/20">
-          <span className="text-[11px] font-semibold text-emerald-700 uppercase dark:text-emerald-400">Operational Lines</span>
-          <p className="mt-1 text-2xl font-black text-emerald-800 dark:text-emerald-300">{activeRoutes} Lines</p>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-occ-darkCard">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase">Total Network Span</span>
-          <p className="mt-1 text-2xl font-black text-slate-800 dark:text-slate-200">{totalNetworkKm.toFixed(1)} km</p>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <KPICard
+          title="OPERATIONAL LINES"
+          value={`${activeRoutes} Lines`}
+          status="teal"
+          icon={CheckCircle}
+        />
+        <KPICard
+          title="TOTAL NETWORK SPAN"
+          value={`${totalNetworkKm.toFixed(1)} km`}
+          status="info"
+          icon={Navigation}
+        />
       </div>
 
       {/* DataTable */}
@@ -207,7 +210,6 @@ export const Routes: React.FC = () => {
         isOpen={formModalOpen}
         onClose={() => setFormModalOpen(false)}
         title={selectedRoute ? `Edit Route Sequence: ${selectedRoute.routeCode}` : 'Create New Transit Corridor'}
-        description="Re-order bus stops, configure travel distances, and set operating timetables."
         size="2xl"
       >
         <RouteEditor

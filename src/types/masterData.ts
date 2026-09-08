@@ -24,9 +24,9 @@ export interface Driver {
 export type VehicleStatus = 'active' | 'maintenance' | 'inactive' | 'decommissioned';
 
 export type BusFleetType = 
-  | 'AC Volvo Electric'
+  | 'City Express'
   | 'City Regular Eco'
-  | 'Smart Feeder Electric'
+  | 'Smart Feeder'
   | 'Industrial Express'
   | 'City Connector'
   | 'Suburban Shuttle'

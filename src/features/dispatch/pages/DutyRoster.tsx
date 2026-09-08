@@ -9,6 +9,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { DutyForm } from '../components/DutyForm';
 import { DispatchNavigationTabs } from '../components/DispatchNavigationTabs';
 import { TableColumn } from '@/types';
+import { KPICard } from '@/components/ui/KPICard';
 import { Link } from 'react-router-dom';
 import {
   CalendarDays,
@@ -113,8 +114,8 @@ export const DutyRoster: React.FC = () => {
       key: 'driverName',
       header: 'Assigned Driver',
       render: (row) => (
-        <div className="flex items-center space-x-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100 font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+        <div className="flex items-center space-x-2.5">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 font-bold text-blue-700 border border-blue-200/60 dark:from-blue-950 dark:to-indigo-950 dark:text-blue-300 text-xs">
             {row.driverName.charAt(0)}
           </div>
           <div className="flex flex-col">
@@ -126,7 +127,7 @@ export const DutyRoster: React.FC = () => {
     },
     {
       key: 'plateNumber',
-      header: 'Bus Vehicle',
+      header: 'Vehicle No',
       render: (row) => (
         <div className="flex flex-col text-xs">
           <span className="font-bold text-slate-800 dark:text-slate-200">{row.plateNumber}</span>
@@ -139,7 +140,7 @@ export const DutyRoster: React.FC = () => {
       header: 'Corridor Route',
       render: (row) => (
         <div className="flex items-center space-x-1.5">
-          <span className="rounded bg-brand-100 px-1.5 py-0.5 text-xs font-bold text-brand-800 dark:bg-brand-950 dark:text-brand-300">
+          <span className="rounded-full bg-blue-50 border border-blue-200/60 px-2 py-0.5 text-xs font-bold text-blue-700 dark:bg-blue-950 dark:text-blue-300">
             {row.routeCode}
           </span>
           <span className="text-xs text-slate-600 dark:text-slate-300 truncate max-w-[140px]">
@@ -165,7 +166,7 @@ export const DutyRoster: React.FC = () => {
           </span>
           <div className="mt-1 h-1.5 w-16 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
             <div
-              className="h-full bg-brand-600"
+              className="h-full bg-blue-600 rounded-full"
               style={{ width: `${(row.tripsCompleted / Math.max(1, row.tripsCount)) * 100}%` }}
             />
           </div>
@@ -177,17 +178,17 @@ export const DutyRoster: React.FC = () => {
       header: 'Actions',
       align: 'right',
       render: (row) => (
-        <div className="flex items-center justify-end space-x-1.5">
+        <div className="flex items-center justify-end space-x-1">
           <button
             onClick={() => handleOpenEdit(row)}
-            className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"
+            className="h-8 w-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all active:scale-95"
             title="Edit Duty"
           >
             <Edit2 className="h-4 w-4" />
           </button>
           <button
             onClick={() => setDeleteConfirmDuty(row)}
-            className="rounded-lg p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40"
+            className="h-8 w-8 rounded-full flex items-center justify-center text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-all active:scale-95"
             title="Cancel Duty"
           >
             <Trash2 className="h-4 w-4" />
@@ -205,23 +206,25 @@ export const DutyRoster: React.FC = () => {
       {/* Header & Date Controller */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <div className="flex items-center space-x-2">
-            <CalendarDays className="h-6 w-6 text-brand-700 dark:text-brand-400" />
+          <div className="flex items-center space-x-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+              <CalendarDays className="h-5 w-5" />
+            </div>
             <h1 className="text-2xl font-extrabold tracking-tight text-occ-text dark:text-white">
               Daily Duty Roster
             </h1>
           </div>
           <p className="mt-1 text-xs text-occ-muted dark:text-slate-400">
-            Link transit staff (Driver) + fleet unit (Bus) + transit line (Route) + shift rotation.
+            Link transit staff (Driver) + bus unit + transit line (Route) + shift rotation.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           {/* Date Picker Bar */}
-          <div className="flex items-center space-x-1 rounded-xl border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-800 dark:bg-occ-darkCard">
+          <div className="flex items-center space-x-1 rounded-full border border-slate-200/80 bg-slate-100/90 p-1 shadow-xs dark:border-slate-700/80 dark:bg-slate-800/90 backdrop-blur-md">
             <button
               onClick={handlePrevDay}
-              className="rounded-lg p-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="h-7 w-7 rounded-full flex items-center justify-center text-slate-500 hover:bg-white dark:hover:bg-slate-700 transition"
               title="Previous Day"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -230,11 +233,11 @@ export const DutyRoster: React.FC = () => {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="border-none bg-transparent px-2 py-1 text-xs font-bold text-slate-800 focus:outline-none dark:text-white"
+              className="border-none bg-transparent px-2 py-0.5 text-xs font-bold text-slate-800 focus:outline-none dark:text-white"
             />
             <button
               onClick={handleNextDay}
-              className="rounded-lg p-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="h-7 w-7 rounded-full flex items-center justify-center text-slate-500 hover:bg-white dark:hover:bg-slate-700 transition"
               title="Next Day"
             >
               <ChevronRight className="h-4 w-4" />
@@ -243,7 +246,7 @@ export const DutyRoster: React.FC = () => {
 
           <button
             onClick={handleOpenCreate}
-            className="inline-flex items-center space-x-2 rounded-xl bg-brand-700 px-4 py-2 text-xs font-bold text-white shadow-md transition hover:bg-brand-800"
+            className="inline-flex items-center space-x-2 rounded-full bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-500/25 transition-all hover:bg-blue-700 active:scale-95"
           >
             <Plus className="h-4 w-4" />
             <span>Create Duty</span>
@@ -252,23 +255,31 @@ export const DutyRoster: React.FC = () => {
       </div>
 
       {/* Roster Metrics Strip */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-occ-darkCard">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase">Total Duties Scheduled</span>
-          <p className="mt-1 text-2xl font-black text-slate-900 dark:text-white">{totalDuties}</p>
-        </div>
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 shadow-sm dark:border-emerald-950 dark:bg-emerald-950/20">
-          <span className="text-[11px] font-semibold text-emerald-700 uppercase dark:text-emerald-400">In-Progress Now</span>
-          <p className="mt-1 text-2xl font-black text-emerald-800 dark:text-emerald-300">{inProgressDuties}</p>
-        </div>
-        <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-4 shadow-sm dark:border-blue-950 dark:bg-blue-950/20">
-          <span className="text-[11px] font-semibold text-blue-700 uppercase dark:text-blue-400">Morning Shift (Shift 1)</span>
-          <p className="mt-1 text-2xl font-black text-blue-800 dark:text-blue-300">{morningDuties}</p>
-        </div>
-        <div className="rounded-xl border border-purple-200 bg-purple-50/50 p-4 shadow-sm dark:border-purple-950 dark:bg-purple-950/20">
-          <span className="text-[11px] font-semibold text-purple-700 uppercase dark:text-purple-400">Evening Shift (Shift 2)</span>
-          <p className="mt-1 text-2xl font-black text-purple-800 dark:text-purple-300">{eveningDuties}</p>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <KPICard
+          title="DUTIES SCHEDULED"
+          value={totalDuties}
+          status="dark"
+          icon={CalendarDays}
+        />
+        <KPICard
+          title="IN-PROGRESS NOW"
+          value={inProgressDuties}
+          status="teal"
+          icon={CheckCircle2}
+        />
+        <KPICard
+          title="MORNING SHIFT"
+          value={morningDuties}
+          status="info"
+          icon={Clock}
+        />
+        <KPICard
+          title="EVENING SHIFT"
+          value={eveningDuties}
+          status="orange"
+          icon={Zap}
+        />
       </div>
 
       {/* Duty Table */}
@@ -285,7 +296,6 @@ export const DutyRoster: React.FC = () => {
         isOpen={formModalOpen}
         onClose={() => setFormModalOpen(false)}
         title={selectedDuty ? `Edit Duty: ${selectedDuty.dutyCode}` : 'Create Daily Duty Assignment'}
-        description="Select a driver, bus, route, and shift. Conflict checks run automatically."
         size="lg"
       >
         <DutyForm

@@ -4,39 +4,28 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { FormField } from '@/components/ui/FormField';
 import {
   MessageSquareWarning,
-  User,
   Phone,
   Clock,
   GitFork,
   Bus,
   CheckCircle2,
   Send,
-  Building2,
 } from 'lucide-react';
 
 interface ComplaintDetailModalProps {
   complaint: PassengerComplaint;
-  onAssign: (id: string, officer: string, depot: string) => Promise<void>;
+  onAssign?: (id: string, officer: string, depot: string) => Promise<void>;
   onResolve: (id: string, response: string) => Promise<void>;
   onClose: () => void;
 }
 
 export const ComplaintDetailModal: React.FC<ComplaintDetailModalProps> = ({
   complaint,
-  onAssign,
   onResolve,
   onClose,
 }) => {
-  const [assignedOfficer, setAssignedOfficer] = useState(complaint.assignedOfficer || 'Support Admin Priya');
-  const [assignedDepot, setAssignedDepot] = useState(complaint.assignedDepot || 'Central Depot 1');
   const [officialResponse, setOfficialResponse] = useState(complaint.officialResponse || '');
   const [isProcessing, setIsProcessing] = useState(false);
-
-  const handleAssign = async () => {
-    setIsProcessing(true);
-    await onAssign(complaint.id, assignedOfficer, assignedDepot);
-    setIsProcessing(false);
-  };
 
   const handleResolve = async () => {
     if (!officialResponse.trim()) {
@@ -87,40 +76,12 @@ export const ComplaintDetailModal: React.FC<ComplaintDetailModalProps> = ({
         </div>
       </div>
 
-      {/* Assignment & Response Form */}
+      {/* Response Form */}
       {complaint.status !== 'RESOLVED' ? (
-        <div className="rounded-xl border border-brand-200 bg-brand-50/40 p-4 space-y-4 dark:border-brand-900/60 dark:bg-brand-950/20">
-          <span className="text-xs font-bold text-brand-950 dark:text-brand-300 block">
+        <div className="rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4 space-y-4 dark:border-slate-800 dark:bg-slate-900/50">
+          <span className="text-xs font-bold text-slate-900 dark:text-white block">
             Resolution Workflow Actions
           </span>
-
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <FormField
-              label="Assign Grievance Officer"
-              as="select"
-              value={assignedOfficer}
-              onChange={(e) => setAssignedOfficer(e.target.value)}
-              options={[
-                { label: 'Support Admin Priya', value: 'Support Admin Priya' },
-                { label: 'Fleet Manager Sunder', value: 'Fleet Manager Sunder' },
-                { label: 'Operations Manager', value: 'Operations Manager' },
-                { label: 'Dispatcher Ramesh', value: 'Dispatcher Ramesh' },
-              ]}
-              icon={User}
-            />
-
-            <FormField
-              label="Assigned Depot"
-              as="select"
-              value={assignedDepot}
-              onChange={(e) => setAssignedDepot(e.target.value)}
-              options={[
-                { label: 'Central Depot 1 (Tumakuru Town)', value: 'Central Depot 1' },
-                { label: 'Industrial Depot 2 (Melekote)', value: 'Industrial Depot 2' },
-              ]}
-              icon={Building2}
-            />
-          </div>
 
           <FormField
             label="Official Resolution Statement (Sent to Citizen App)"
@@ -129,26 +90,15 @@ export const ComplaintDetailModal: React.FC<ComplaintDetailModalProps> = ({
             rows={3}
             value={officialResponse}
             onChange={(e) => setOfficialResponse(e.target.value)}
-            placeholder="e.g. Schedule deviation investigated. Depot supervisor notified to ensure timely departure..."
+            placeholder="Enter official resolution response..."
           />
 
-          <div className="flex items-center justify-end space-x-2 pt-2">
-            {complaint.status === 'OPEN' && (
-              <button
-                type="button"
-                onClick={handleAssign}
-                disabled={isProcessing}
-                className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-bold text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
-              >
-                {isProcessing ? 'Assigning...' : 'Assign to Officer'}
-              </button>
-            )}
-
+          <div className="flex items-center justify-end pt-2">
             <button
               type="button"
               onClick={handleResolve}
               disabled={isProcessing || !officialResponse.trim()}
-              className="inline-flex items-center space-x-1.5 rounded-xl bg-emerald-600 px-4 py-2 font-bold text-white shadow-md hover:bg-emerald-700 disabled:opacity-50"
+              className="inline-flex items-center space-x-1.5 rounded-full bg-emerald-600 px-5 py-2.5 font-bold text-white shadow-md shadow-emerald-500/25 hover:bg-emerald-700 disabled:opacity-50 active:scale-95 transition-all"
             >
               <CheckCircle2 className="h-4 w-4" />
               <span>{isProcessing ? 'Resolving...' : 'Submit Resolution & Close Ticket'}</span>

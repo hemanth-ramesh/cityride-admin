@@ -863,15 +863,15 @@ export const SEED_VEHICLES: Vehicle[] = [
     registrationNumber: 'KA 06 F 8558',
     normalizedNumber: 'KA06F8558',
     fleetNumber: 'CR-TUM-01',
-    fleetType: 'AC Volvo Electric',
+    fleetType: 'City Express',
     capacity: 45,
     seatingCapacity: 35,
     standingCapacity: 10,
     status: 'active',
     depotId: 'DEPOT_01_CENTRAL',
     depotName: 'Tumakuru Central Depot 1',
-    isElectric: true,
-    hasAc: true,
+    isElectric: false,
+    hasAc: false,
     manufactureYear: 2024,
     currentDriverId: 'drv-001',
     currentDriverName: 'Rajesh DRV-1042',
@@ -907,15 +907,15 @@ export const SEED_VEHICLES: Vehicle[] = [
     registrationNumber: 'KA 06 G 4321',
     normalizedNumber: 'KA06G4321',
     fleetNumber: 'CR-TUM-03',
-    fleetType: 'Smart Feeder Electric',
+    fleetType: 'Smart Feeder',
     capacity: 35,
     seatingCapacity: 25,
     standingCapacity: 10,
     status: 'active',
     depotId: 'DEPOT_01_CENTRAL',
     depotName: 'Tumakuru Central Depot 1',
-    isElectric: true,
-    hasAc: true,
+    isElectric: false,
+    hasAc: false,
     manufactureYear: 2024,
     currentDriverId: 'drv-003',
     currentDriverName: 'Manjunath DRV-1089',
@@ -1024,8 +1024,8 @@ export const SEED_VEHICLES: Vehicle[] = [
     status: 'active',
     depotId: 'DEPOT_01_CENTRAL',
     depotName: 'Tumakuru Central Depot 1',
-    isElectric: true,
-    hasAc: true,
+    isElectric: false,
+    hasAc: false,
     manufactureYear: 2024,
     currentDriverId: 'drv-008',
     currentDriverName: 'Girish DRV-1090',
@@ -1277,17 +1277,17 @@ export const SEED_SCHEDULES: RouteSchedule[] = [
 // Helper to get or initialize local storage cache
 function getStorage<T>(key: string, seed: T): T {
   try {
-    const raw = localStorage.getItem(`cityride_master_${key}`);
+    const raw = localStorage.getItem(`cityride_master_${key}_v2`);
     if (raw) return JSON.parse(raw);
   } catch (e) {
     console.warn(`Failed reading master data key ${key}:`, e);
   }
-  localStorage.setItem(`cityride_master_${key}`, JSON.stringify(seed));
+  localStorage.setItem(`cityride_master_${key}_v2`, JSON.stringify(seed));
   return seed;
 }
 
 function setStorage<T>(key: string, data: T) {
-  localStorage.setItem(`cityride_master_${key}`, JSON.stringify(data));
+  localStorage.setItem(`cityride_master_${key}_v2`, JSON.stringify(data));
 }
 
 // ==========================================

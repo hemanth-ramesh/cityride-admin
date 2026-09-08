@@ -188,7 +188,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   return (
     <span
       className={clsx(
-        'inline-flex items-center space-x-1.5 rounded-md border font-medium transition-colors',
+        'inline-flex items-center space-x-1.5 rounded-full border font-semibold transition-colors',
         sizeClasses[size],
         config.bg,
         config.text,

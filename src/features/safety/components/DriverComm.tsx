@@ -49,6 +49,7 @@ export const DriverComm: React.FC = () => {
   const { drivers } = useDrivers();
   const { user } = useAuthStore();
 
+  const [activeTab, setActiveTab] = useState<'compose' | 'audit'>('compose');
   const [selectedDriverId, setSelectedDriverId] = useState(drivers[0]?.id || 'drv-001');
   const [priority, setPriority] = useState<MessagePriority>('NORMAL');
   const [subject, setSubject] = useState('');
@@ -83,182 +84,316 @@ export const DriverComm: React.FC = () => {
     setSubject('');
     setContent('');
     setIsSending(false);
+    setActiveTab('audit');
   };
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-      {/* Left: Compose Message Form (5 cols) */}
-      <div className="lg:col-span-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-occ-darkCard space-y-4">
-        <div className="flex items-center space-x-2">
-          <MessageSquare className="h-5 w-5 text-brand-700 dark:text-brand-400" />
-          <h2 className="text-base font-bold text-slate-900 dark:text-white">
-            Dispatch Driver Message
-          </h2>
-        </div>
-        <p className="text-xs text-slate-500">
-          Send direct broadcast instructions to the mobile cockpit terminal of active drivers.
-        </p>
+    <div className="space-y-6">
+      {/* Horizontal Tabs Switcher */}
+      <div className="inline-flex max-w-full overflow-x-auto items-center gap-1.5 p-1 rounded-full bg-slate-100/90 border border-slate-200/80 shadow-xs dark:bg-slate-800/90 dark:border-slate-700/80 backdrop-blur-md">
+        <button
+          type="button"
+          onClick={() => setActiveTab('compose')}
+          className={`flex items-center space-x-2 rounded-full px-5 py-2 text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 cursor-pointer ${
+            activeTab === 'compose'
+              ? 'bg-white text-slate-900 shadow-sm shadow-slate-900/5 dark:bg-slate-700 dark:text-white'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/50 dark:text-slate-400 dark:hover:text-white'
+          }`}
+        >
+          <Send className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <span>Dispatch Driver Message</span>
+        </button>
 
-        {/* Quick Presets */}
-        <div>
-          <span className="text-[11px] font-semibold text-slate-400">Quick Advisory Templates:</span>
-          <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {MESSAGE_TEMPLATES.map((tmpl) => (
-              <button
-                key={tmpl.title}
-                type="button"
-                onClick={() => handleApplyTemplate(tmpl)}
-                className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-700 hover:border-brand-500 hover:bg-brand-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
-              >
-                {tmpl.title}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <form onSubmit={handleSendMessage} className="space-y-4">
-          <FormField
-            label="Recipient Driver"
-            as="select"
-            required
-            value={selectedDriverId}
-            onChange={(e) => setSelectedDriverId(e.target.value)}
-            options={drivers.map((d) => ({
-              label: `${d.fullName} (${d.driverCode}) — ${d.assignedPlateNumber || 'Active Bus'}`,
-              value: d.id,
-            }))}
-            icon={User}
-          />
-
-          <FormField
-            label="Message Urgency / Priority"
-            as="select"
-            required
-            value={priority}
-            onChange={(e) => setPriority(e.target.value as MessagePriority)}
-            options={[
-              { label: 'Normal (Standard Advisory)', value: 'NORMAL' },
-              { label: 'Urgent (Action Required Immediately)', value: 'URGENT' },
-              { label: 'Emergency Broadcast (Cockpit Alarm)', value: 'EMERGENCY_BROADCAST' },
-            ]}
-          />
-
-          <FormField
-            label="Advisory Subject / Title"
-            required
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            placeholder="e.g. Traffic Diversion at Town Hall"
-          />
-
-          <FormField
-            label="Message Body / Direct Instructions"
-            as="textarea"
-            required
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={3}
-            placeholder="Enter instructions for driver terminal..."
-          />
-
-          <button
-            type="submit"
-            disabled={isSending || !content.trim()}
-            className="w-full inline-flex items-center justify-center space-x-2 rounded-xl bg-brand-700 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-brand-800 disabled:opacity-50"
-          >
-            <Send className="h-4 w-4" />
-            <span>{isSending ? 'Transmitting to Terminal...' : 'Transmit Message to Cockpit'}</span>
-          </button>
-        </form>
+        <button
+          type="button"
+          onClick={() => setActiveTab('audit')}
+          className={`flex items-center space-x-2 rounded-full px-5 py-2 text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 cursor-pointer ${
+            activeTab === 'audit'
+              ? 'bg-white text-slate-900 shadow-sm shadow-slate-900/5 dark:bg-slate-700 dark:text-white'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/50 dark:text-slate-400 dark:hover:text-white'
+          }`}
+        >
+          <Radio className="h-4 w-4 text-emerald-500" />
+          <span>Cockpit Communication Audit Trail</span>
+          <span className="rounded-full bg-slate-200/80 px-2 py-0.5 text-[10px] font-bold text-slate-700 dark:bg-slate-600 dark:text-slate-200">
+            {driverMessages.length}
+          </span>
+        </button>
       </div>
 
-      {/* Right: Message Stream & Audit Trail (7 cols) */}
-      <div className="lg:col-span-7 rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-occ-darkCard flex flex-col h-[580px]">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 p-4 dark:border-slate-800">
-          <div className="flex items-center space-x-2">
-            <Radio className="h-4 w-4 text-emerald-500 animate-pulse" />
-            <h3 className="text-xs font-black tracking-wider text-slate-900 uppercase dark:text-white">
-              Cockpit Communication Audit Trail ({driverMessages.length})
-            </h3>
-          </div>
-          <span className="text-[10px] text-slate-400">Encrypted Terminal Protocol</span>
-        </div>
-
-        {/* Stream List */}
-        <div className="flex-1 overflow-y-auto divide-y divide-slate-100 p-3 space-y-3 dark:divide-slate-800/60">
-          {driverMessages.map((msg) => {
-            const isEmergency = msg.priority === 'EMERGENCY_BROADCAST';
-            const isUrgent = msg.priority === 'URGENT';
-
-            return (
-              <div
-                key={msg.id}
-                className={`rounded-xl border p-3.5 transition ${
-                  isEmergency
-                    ? 'border-rose-300 bg-rose-50/40 dark:border-rose-900/60 dark:bg-rose-950/20'
-                    : isUrgent
-                    ? 'border-amber-300 bg-amber-50/40 dark:border-amber-900/60 dark:bg-amber-950/20'
-                    : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/50'
-                }`}
-              >
-                {/* Top Row: Driver & Priority Badge */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className="font-bold text-xs text-slate-900 dark:text-white">
-                      To: {msg.driverName}
-                    </span>
-                    <span className="rounded bg-brand-100 px-1.5 py-0.2 text-[10px] font-bold text-brand-800 dark:bg-brand-950 dark:text-brand-300">
-                      {msg.routeCode} • {msg.vehiclePlate}
-                    </span>
-                  </div>
-
-                  <span
-                    className={`rounded-md px-2 py-0.5 text-[9px] font-extrabold uppercase ${
-                      isEmergency
-                        ? 'bg-rose-600 text-white'
-                        : isUrgent
-                        ? 'bg-amber-500 text-white'
-                        : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                    }`}
-                  >
-                    {msg.priority.replace('_', ' ')}
-                  </span>
+      {/* Tab 1: Compose & Dispatch Form */}
+      {activeTab === 'compose' && (
+        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:border-slate-800 dark:bg-occ-darkCard space-y-6 max-w-4xl">
+          <div className="flex items-start justify-between border-b border-slate-100 pb-5 dark:border-slate-800">
+            <div>
+              <div className="flex items-center space-x-2.5">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+                  <MessageSquare className="h-5 w-5" />
                 </div>
-
-                {/* Subject & Content */}
-                <div className="mt-2">
-                  <h4 className="text-xs font-bold text-slate-900 dark:text-white">
-                    {msg.subject}
-                  </h4>
-                  <p className="mt-1 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                    {msg.content}
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                    Dispatch Driver Message
+                  </h2>
+                  <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                    Transmit official dispatch instructions directly to the mobile cockpit terminal of active drivers.
                   </p>
                 </div>
-
-                {/* Driver Reply if present */}
-                {msg.driverReply && (
-                  <div className="mt-2.5 rounded-lg border border-slate-200 bg-slate-50 p-2 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300">
-                    <span className="text-[10px] font-bold text-brand-600 dark:text-brand-400 block">
-                      Driver Response:
-                    </span>
-                    <p className="italic">{msg.driverReply}</p>
-                  </div>
-                )}
-
-                {/* Footer Timestamp & Delivery Status */}
-                <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2 text-[10px] text-slate-400 dark:border-slate-800">
-                  <span>From: {msg.senderName} ({msg.senderRole}) • {new Date(msg.sentAt).toLocaleTimeString()}</span>
-                  <div className="flex items-center space-x-1 font-semibold text-emerald-600 dark:text-emerald-400">
-                    <CheckCheck className="h-3.5 w-3.5" />
-                    <span>{msg.deliveryStatus.replace(/_/g, ' ')}</span>
-                  </div>
-                </div>
               </div>
-            );
-          })}
+            </div>
+          </div>
+
+          {/* Quick Presets */}
+          <div className="rounded-2xl border border-slate-200/70 bg-slate-50/60 p-4 dark:border-slate-800 dark:bg-slate-900/40">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
+              Quick Advisory Presets:
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {MESSAGE_TEMPLATES.map((tmpl) => (
+                <button
+                  key={tmpl.title}
+                  type="button"
+                  onClick={() => handleApplyTemplate(tmpl)}
+                  className="rounded-full border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/70 px-4 py-1.5 text-xs font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition active:scale-95 cursor-pointer shadow-2xs"
+                >
+                  {tmpl.title}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <form onSubmit={handleSendMessage} className="space-y-5">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                label="Recipient Driver"
+                as="search-select"
+                required
+                value={selectedDriverId}
+                onChange={(e) => setSelectedDriverId(e.target.value)}
+                options={drivers.map((d) => ({
+                  label: `${d.fullName} (${d.driverCode}) — ${d.assignedPlateNumber || 'Active Bus'}`,
+                  value: d.id,
+                }))}
+                placeholder="Search driver by name, code, or bus..."
+                icon={User}
+              />
+
+              <FormField
+                label="Message Urgency / Priority"
+                as="select"
+                required
+                value={priority}
+                onChange={(e) => setPriority(e.target.value as MessagePriority)}
+                options={[
+                  { label: 'Normal (Standard Advisory)', value: 'NORMAL' },
+                  { label: 'Urgent (Action Required Immediately)', value: 'URGENT' },
+                  { label: 'Emergency Broadcast (Cockpit Alarm)', value: 'EMERGENCY_BROADCAST' },
+                ]}
+              />
+            </div>
+
+            <FormField
+              label="Advisory Subject / Title"
+              required
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="e.g. Traffic Diversion at Town Hall Junction"
+            />
+
+            <FormField
+              label="Message Body / Direct Instructions"
+              as="textarea"
+              required
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={4}
+              placeholder="Enter specific instructions or situational guidelines for the driver terminal..."
+            />
+
+            <div className="flex items-center justify-end space-x-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setSubject('');
+                  setContent('');
+                }}
+                className="rounded-full border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 transition"
+              >
+                Clear
+              </button>
+              <button
+                type="submit"
+                disabled={isSending || !content.trim() || !subject.trim()}
+                className="inline-flex items-center space-x-2 rounded-full bg-blue-600 px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-500/25 transition-all hover:bg-blue-700 active:scale-95 disabled:opacity-50 cursor-pointer"
+              >
+                <Send className="h-4 w-4" />
+                <span>{isSending ? 'Transmitting to Terminal...' : 'Transmit Message to Cockpit'}</span>
+              </button>
+            </div>
+          </form>
         </div>
-      </div>
+      )}
+
+      {/* Tab 2: Message Stream & Audit Trail */}
+      {activeTab === 'audit' && (
+        <div className="rounded-3xl border border-slate-200/80 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:border-slate-800 dark:bg-occ-darkCard flex flex-col">
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-slate-100/80 p-5 sm:p-6 dark:border-slate-800/80">
+            <div className="flex items-center space-x-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
+                <Radio className="h-4 w-4 animate-pulse" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">
+                  Cockpit Communication Audit Trail ({driverMessages.length} Messages)
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Full historical telemetry of sent broadcasts, acknowledgments, and driver responses.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="rounded-full bg-emerald-50 border border-emerald-200/60 px-3 py-1 text-[11px] font-bold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                ● Encrypted Radio Channel
+              </span>
+            </div>
+          </div>
+
+          {/* Stream List */}
+          <div className="p-5 sm:p-6 space-y-4">
+            {driverMessages.length > 0 ? (
+              driverMessages.map((msg) => {
+                const isEmergency = msg.priority === 'EMERGENCY_BROADCAST';
+                const isUrgent = msg.priority === 'URGENT';
+
+                const isNormal = !isEmergency && !isUrgent;
+
+                // Distinct styling based on priority
+                const cardConfig = isEmergency
+                  ? {
+                      container: 'border-l-4 border-l-rose-500 border-rose-200/90 bg-gradient-to-r from-rose-50/70 to-white dark:border-rose-900/60 dark:from-rose-950/25 dark:to-slate-900/40 shadow-xs hover:shadow-md hover:border-rose-300',
+                      avatarBg: 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 ring-1 ring-rose-200/80 dark:ring-rose-800/60',
+                      badge: 'bg-rose-600 text-white shadow-xs',
+                      busBadge: 'bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100',
+                      titleColor: 'text-slate-900 dark:text-white',
+                      accentIcon: <Flame className="h-3.5 w-3.5 mr-1 text-white animate-pulse" />,
+                      replyBg: 'border-rose-200/80 bg-white/80 dark:border-rose-900/40 dark:bg-slate-900/60',
+                      replyLabel: 'text-rose-700 dark:text-rose-400',
+                    }
+                  : isUrgent
+                  ? {
+                      container: 'border-l-4 border-l-[#ff681d] border-orange-200/90 bg-gradient-to-r from-orange-50/60 to-white dark:border-orange-900/60 dark:from-orange-950/25 dark:to-slate-900/40 shadow-xs hover:shadow-md hover:border-orange-300',
+                      avatarBg: 'bg-orange-100 text-[#ff681d] dark:bg-orange-950 dark:text-orange-300 ring-1 ring-orange-200/80 dark:ring-orange-800/60',
+                      badge: 'bg-[#ff681d] text-white shadow-xs',
+                      busBadge: 'bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100',
+                      titleColor: 'text-slate-900 dark:text-white',
+                      accentIcon: <AlertCircle className="h-3.5 w-3.5 mr-1 text-white" />,
+                      replyBg: 'border-orange-200/80 bg-white/80 dark:border-orange-900/40 dark:bg-slate-900/60',
+                      replyLabel: 'text-orange-700 dark:text-orange-400',
+                    }
+                  : {
+                      container: 'border-l-4 border-l-[#2563eb] border-blue-200/90 bg-gradient-to-r from-blue-50/50 to-white dark:border-blue-900/60 dark:from-blue-950/20 dark:to-slate-900/40 shadow-xs hover:shadow-md hover:border-blue-300',
+                      avatarBg: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 ring-1 ring-blue-200/80 dark:ring-blue-800/60',
+                      badge: 'bg-[#2563eb] text-white shadow-xs',
+                      busBadge: 'bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100',
+                      titleColor: 'text-slate-900 dark:text-white',
+                      accentIcon: <Radio className="h-3.5 w-3.5 mr-1 text-white" />,
+                      replyBg: 'border-blue-200/80 bg-white/80 dark:border-blue-900/40 dark:bg-slate-900/60',
+                      replyLabel: 'text-blue-700 dark:text-blue-400',
+                    };
+
+                return (
+                  <div
+                    key={msg.id}
+                    className={`rounded-2xl border p-5 sm:p-6 transition-all duration-200 ${cardConfig.container}`}
+                  >
+                    {/* Top Row: Driver Avatar & Info + Badges */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center space-x-3">
+                        <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl font-bold text-sm shadow-2xs ${cardConfig.avatarBg}`}>
+                          {msg.driverName.charAt(0)}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white tracking-tight">
+                              To: {msg.driverName}
+                            </span>
+                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold shadow-2xs ${cardConfig.busBadge}`}>
+                              {msg.routeCode} • {msg.vehiclePlate}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                            Cockpit Terminal #{msg.id.slice(-6).toUpperCase()}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <span
+                          className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wide ${cardConfig.badge}`}
+                        >
+                          {cardConfig.accentIcon}
+                          {msg.priority.replace(/_/g, ' ')}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Message Subject & Content */}
+                    <div className="mt-4 pt-1">
+                      <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight">
+                        {msg.subject}
+                      </h4>
+                      <p className="mt-1.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+                        {msg.content}
+                      </p>
+                    </div>
+
+                    {/* Driver Response Pill / Block */}
+                    {msg.driverReply && (
+                      <div className={`mt-3.5 rounded-xl border p-3 text-xs ${cardConfig.replyBg}`}>
+                        <div className="flex items-center space-x-1.5 mb-1">
+                          <span className={`text-[10px] font-extrabold uppercase tracking-wider ${cardConfig.replyLabel}`}>
+                            Driver Cockpit Response:
+                          </span>
+                        </div>
+                        <p className="italic font-medium text-slate-800 dark:text-slate-200">
+                          "{msg.driverReply}"
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Footer Row: Sender Info & Delivery Status */}
+                    <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-slate-200/60 pt-3 text-xs text-slate-400 dark:border-slate-800/80 dark:text-slate-500">
+                      <span>
+                        Sent by <strong className="font-semibold text-slate-700 dark:text-slate-300">{msg.senderName}</strong> ({msg.senderRole}) •{' '}
+                        {new Date(msg.sentAt).toLocaleString()}
+                      </span>
+                      <div className="flex items-center space-x-1.5 font-bold text-emerald-600 dark:text-emerald-400">
+                        <CheckCheck className="h-4 w-4 stroke-[2.2]" />
+                        <span className="text-[11px] uppercase tracking-wide">
+                          {msg.deliveryStatus.replace(/_/g, ' ')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="py-12 text-center text-slate-400">
+                <MessageSquare className="mx-auto h-8 w-8 opacity-30 mb-2" />
+                <p className="text-xs">No dispatch messages sent yet.</p>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('compose')}
+                  className="mt-3 inline-flex items-center space-x-1 text-xs text-blue-600 hover:underline font-semibold"
+                >
+                  <Send className="h-3.5 w-3.5" />
+                  <span>Transmit first driver message</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

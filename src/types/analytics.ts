@@ -14,8 +14,8 @@ export interface PropulsionDistributionStat {
 export interface DailyFleetDistanceStat {
   day: string;
   totalKm: number;
-  evKm: number;
-  dieselKm: number;
+  peakHoursKm: number;
+  offPeakKm: number;
 }
 
 export interface DriverPerformanceStat {

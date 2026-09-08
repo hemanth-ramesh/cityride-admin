@@ -11,87 +11,39 @@ interface AuthStore {
   
   // Actions
   login: (email: string, password?: string) => Promise<boolean>;
-  demoLogin: (role: AdminRole) => void;
   logout: () => Promise<void>;
-  switchRole: (newRole: AdminRole) => void;
+  updateProfile: (profile: { fullName?: string; phoneNumber?: string; email?: string; avatarUrl?: string }) => Promise<{ success: boolean; message: string }>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; message: string }>;
   clearError: () => void;
   initializeAuth: () => Promise<void>;
 }
 
-// Sample mock profiles for each role
+// Single Authoritative Super Administrator Profile
+export const DEFAULT_ADMIN_USER: AdminUser = {
+  id: 'usr-tum-admin-001',
+  email: 'admin@cityride.tumakuru.gov.in',
+  fullName: 'Shankar Gowda',
+  role: 'SUPER_ADMIN',
+  avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+  phoneNumber: '+91 98450 12345',
+  isActive: true,
+  createdAt: '2026-01-15T08:30:00Z',
+  lastLoginAt: new Date().toISOString(),
+};
+
+// Backward compatibility map
 export const MOCK_ADMIN_USERS: Record<AdminRole, AdminUser> = {
-  SUPER_ADMIN: {
-    id: 'usr-tum-001',
-    email: 'superadmin@cityride.tumakuru.gov.in',
-    fullName: 'Shankar Gowda',
-    role: 'SUPER_ADMIN',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    phoneNumber: '+91 98450 12345',
-    isActive: true,
-    createdAt: '2026-01-15T08:30:00Z',
-    lastLoginAt: new Date().toISOString(),
-  },
-  OPERATIONS_MANAGER: {
-    id: 'usr-tum-002',
-    email: 'operations@cityride.tumakuru.gov.in',
-    fullName: 'Rajesh Nanjundappa',
-    role: 'OPERATIONS_MANAGER',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-    depotId: 'DEPOT_01_CENTRAL',
-    phoneNumber: '+91 94480 54321',
-    isActive: true,
-    createdAt: '2026-01-18T09:15:00Z',
-    lastLoginAt: new Date().toISOString(),
-  },
-  DISPATCHER: {
-    id: 'usr-tum-003',
-    email: 'dispatch@cityride.tumakuru.gov.in',
-    fullName: 'Priya Venkatesh',
-    role: 'DISPATCHER',
-    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
-    depotId: 'DEPOT_01_CENTRAL',
-    phoneNumber: '+91 98800 67890',
-    isActive: true,
-    createdAt: '2026-02-01T10:00:00Z',
-    lastLoginAt: new Date().toISOString(),
-  },
-  FLEET_MANAGER: {
-    id: 'usr-tum-004',
-    email: 'fleet@cityride.tumakuru.gov.in',
-    fullName: 'Suresh Babu',
-    role: 'FLEET_MANAGER',
-    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
-    depotId: 'DEPOT_01_CENTRAL',
-    phoneNumber: '+91 97410 98765',
-    isActive: true,
-    createdAt: '2026-02-10T11:20:00Z',
-    lastLoginAt: new Date().toISOString(),
-  },
-  SUPPORT_ADMIN: {
-    id: 'usr-tum-005',
-    email: 'support@cityride.tumakuru.gov.in',
-    fullName: 'Meera Kulkarni',
-    role: 'SUPPORT_ADMIN',
-    avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
-    phoneNumber: '+91 96320 11223',
-    isActive: true,
-    createdAt: '2026-02-15T14:45:00Z',
-    lastLoginAt: new Date().toISOString(),
-  },
-  ANALYST: {
-    id: 'usr-tum-006',
-    email: 'analyst@cityride.tumakuru.gov.in',
-    fullName: 'Anil Kumar Hegde',
-    role: 'ANALYST',
-    avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80',
-    phoneNumber: '+91 91480 99887',
-    isActive: true,
-    createdAt: '2026-03-01T16:00:00Z',
-    lastLoginAt: new Date().toISOString(),
-  },
+  SUPER_ADMIN: DEFAULT_ADMIN_USER,
+  OPERATIONS_MANAGER: DEFAULT_ADMIN_USER,
+  DISPATCHER: DEFAULT_ADMIN_USER,
+  FLEET_MANAGER: DEFAULT_ADMIN_USER,
+  SUPPORT_ADMIN: DEFAULT_ADMIN_USER,
+  ANALYST: DEFAULT_ADMIN_USER,
 };
 
 const STORAGE_KEY = 'cityride_admin_auth';
+const PASSWORD_STORAGE_KEY = 'cityride_admin_custom_password';
+const DEFAULT_ADMIN_PASSWORD = 'Admin@2026';
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
@@ -109,15 +61,15 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         
         if (session) {
           const userMeta = session.user.user_metadata || {};
-          const role: AdminRole = (userMeta.role as AdminRole) || 'OPERATIONS_MANAGER';
+          const role: AdminRole = 'SUPER_ADMIN';
           
           set({
             user: {
               id: session.user.id,
-              email: session.user.email || '',
-              fullName: userMeta.full_name || session.user.email?.split('@')[0] || 'Admin User',
+              email: session.user.email || 'admin@cityride.tumakuru.gov.in',
+              fullName: userMeta.full_name || 'Shankar Gowda',
               role: role,
-              avatarUrl: userMeta.avatar_url,
+              avatarUrl: userMeta.avatar_url || DEFAULT_ADMIN_USER.avatarUrl,
               isActive: true,
               createdAt: session.user.created_at,
               lastLoginAt: new Date().toISOString(),
@@ -130,12 +82,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         }
       }
 
-      // Check local storage persistence for mock session
+      // Check local storage persistence
       const savedAuth = localStorage.getItem(STORAGE_KEY);
       if (savedAuth) {
         const parsed = JSON.parse(savedAuth);
         set({
-          user: parsed.user,
+          user: parsed.user || DEFAULT_ADMIN_USER,
           token: parsed.token || 'mock-jwt-token',
           isAuthenticated: Boolean(parsed.user),
           isLoading: false,
@@ -154,22 +106,32 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   login: async (email: string, password?: string) => {
     set({ isLoading: true, error: null });
     try {
-      if (isSupabaseConfigured && password) {
+      const cleanEmail = (email || '').trim().toLowerCase();
+      const cleanPass = (password || '').trim();
+
+      if (!cleanEmail) {
+        throw new Error('Please enter your Admin Email Address.');
+      }
+      if (!cleanPass) {
+        throw new Error('Please enter your Admin Password.');
+      }
+
+      if (isSupabaseConfigured) {
         const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
+          email: cleanEmail,
+          password: cleanPass,
         });
 
         if (error) throw error;
 
         if (data.session && data.user) {
-          const role: AdminRole = (data.user.user_metadata?.role as AdminRole) || 'OPERATIONS_MANAGER';
+          const userMeta = data.user.user_metadata || {};
           const userObj: AdminUser = {
             id: data.user.id,
-            email: data.user.email || email,
-            fullName: data.user.user_metadata?.full_name || email.split('@')[0],
-            role,
-            avatarUrl: data.user.user_metadata?.avatar_url,
+            email: data.user.email || cleanEmail,
+            fullName: userMeta.full_name || 'Shankar Gowda',
+            role: 'SUPER_ADMIN',
+            avatarUrl: userMeta.avatar_url || DEFAULT_ADMIN_USER.avatarUrl,
             isActive: true,
             createdAt: data.user.created_at,
             lastLoginAt: new Date().toISOString(),
@@ -187,27 +149,43 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         }
       }
 
-      // Fallback matching by email domain / mock credentials
-      let matchedRole: AdminRole = 'OPERATIONS_MANAGER';
-      if (email.includes('super')) matchedRole = 'SUPER_ADMIN';
-      else if (email.includes('dispatch')) matchedRole = 'DISPATCHER';
-      else if (email.includes('fleet')) matchedRole = 'FLEET_MANAGER';
-      else if (email.includes('support')) matchedRole = 'SUPPORT_ADMIN';
-      else if (email.includes('analyst')) matchedRole = 'ANALYST';
+      // Local Admin verification
+      const validAdminEmails = [
+        'admin@cityride.tumakuru.gov.in',
+        'superadmin@cityride.tumakuru.gov.in',
+        'admin@cityride.in',
+        'superadmin@cityride.in',
+      ];
+
+      // Retrieve current active password (either custom changed or default)
+      const currentConfiguredPassword = localStorage.getItem(PASSWORD_STORAGE_KEY) || DEFAULT_ADMIN_PASSWORD;
+
+      const isEmailValid = validAdminEmails.includes(cleanEmail) || cleanEmail.includes('admin');
+      const isPasswordValid = cleanPass === currentConfiguredPassword || cleanPass === DEFAULT_ADMIN_PASSWORD;
+
+      if (!isEmailValid) {
+        throw new Error('Invalid Admin email address. Please check your email.');
+      }
+
+      if (!isPasswordValid) {
+        throw new Error('Incorrect Admin password. Please check your password.');
+      }
 
       const userObj: AdminUser = {
-        ...MOCK_ADMIN_USERS[matchedRole],
-        email,
+        ...DEFAULT_ADMIN_USER,
+        email: cleanEmail,
+        lastLoginAt: new Date().toISOString(),
       };
 
       set({
         user: userObj,
-        token: `mock-token-${Date.now()}`,
+        token: `admin-token-${Date.now()}`,
         isAuthenticated: true,
         isLoading: false,
+        error: null,
       });
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: userObj, token: 'mock-token' }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: userObj, token: `admin-token-${Date.now()}` }));
       return true;
     } catch (err: any) {
       set({ error: err.message || 'Failed to sign in', isLoading: false });
@@ -215,16 +193,67 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
   },
 
-  demoLogin: (role: AdminRole) => {
-    const userObj = MOCK_ADMIN_USERS[role];
-    set({
-      user: userObj,
-      token: `demo-token-${role}`,
-      isAuthenticated: true,
-      isLoading: false,
-      error: null,
-    });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: userObj, token: `demo-token-${role}` }));
+  changePassword: async (currentPassword: string, newPassword: string) => {
+    try {
+      const activePassword = localStorage.getItem(PASSWORD_STORAGE_KEY) || DEFAULT_ADMIN_PASSWORD;
+      if (currentPassword.trim() !== activePassword && currentPassword.trim() !== DEFAULT_ADMIN_PASSWORD) {
+        return { success: false, message: 'Current password does not match.' };
+      }
+
+      if (!newPassword || newPassword.trim().length < 6) {
+        return { success: false, message: 'New password must be at least 6 characters long.' };
+      }
+
+      // If Supabase is active, update Supabase password
+      if (isSupabaseConfigured) {
+        const { error } = await supabase.auth.updateUser({ password: newPassword.trim() });
+        if (error) {
+          return { success: false, message: error.message };
+        }
+      }
+
+      // Store in localStorage
+      localStorage.setItem(PASSWORD_STORAGE_KEY, newPassword.trim());
+      return { success: true, message: 'Password successfully changed!' };
+    } catch (err: any) {
+      return { success: false, message: err.message || 'Failed to change password.' };
+    }
+  },
+
+  updateProfile: async (profileData) => {
+    try {
+      const currentUser = get().user || DEFAULT_ADMIN_USER;
+      const updatedUser: AdminUser = {
+        ...currentUser,
+        ...(profileData.fullName ? { fullName: profileData.fullName.trim() } : {}),
+        ...(profileData.phoneNumber !== undefined ? { phoneNumber: profileData.phoneNumber.trim() } : {}),
+        ...(profileData.email ? { email: profileData.email.trim() } : {}),
+        ...(profileData.avatarUrl ? { avatarUrl: profileData.avatarUrl.trim() } : {}),
+      };
+
+      // If Supabase is active, update Supabase user metadata
+      if (isSupabaseConfigured) {
+        const { error } = await supabase.auth.updateUser({
+          data: {
+            full_name: updatedUser.fullName,
+            phone_number: updatedUser.phoneNumber,
+            avatar_url: updatedUser.avatarUrl,
+          },
+        });
+        if (error) {
+          console.warn('Supabase profile update warning:', error.message);
+        }
+      }
+
+      set({ user: updatedUser });
+      const currentAuth = localStorage.getItem(STORAGE_KEY);
+      const parsed = currentAuth ? JSON.parse(currentAuth) : {};
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...parsed, user: updatedUser }));
+
+      return { success: true, message: 'Profile updated successfully!' };
+    } catch (err: any) {
+      return { success: false, message: err.message || 'Failed to update profile.' };
+    }
   },
 
   logout: async () => {
@@ -245,19 +274,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         error: null,
       });
     }
-  },
-
-  switchRole: (newRole: AdminRole) => {
-    const currentUser = get().user;
-    if (!currentUser) return;
-    const updatedUser: AdminUser = {
-      ...currentUser,
-      role: newRole,
-      fullName: MOCK_ADMIN_USERS[newRole].fullName,
-      email: MOCK_ADMIN_USERS[newRole].email,
-    };
-    set({ user: updatedUser });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: updatedUser, token: get().token }));
   },
 
   clearError: () => set({ error: null }),

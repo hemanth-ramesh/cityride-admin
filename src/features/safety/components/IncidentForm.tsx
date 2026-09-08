@@ -27,15 +27,15 @@ export const IncidentForm: React.FC<IncidentFormProps> = ({
   const [category, setCategory] = useState<IncidentCategory>('TRAFFIC_GRIDLOCK');
   const [severity, setSeverity] = useState<IncidentSeverity>('MEDIUM');
   const [status, setStatus] = useState<IncidentStatus>('REPORTED');
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [vehicleId, setVehicleId] = useState('');
-  const [driverId, setDriverId] = useState('');
-  const [routeCode, setRouteCode] = useState('R01');
-  const [locationLandmark, setLocationLandmark] = useState('');
-  const [latitude, setLatitude] = useState(13.3382);
-  const [longitude, setLongitude] = useState(77.1012);
-  const [actionTaken, setActionTaken] = useState('');
+  const [title, setTitle] = useState(initialData?.title || '');
+  const [description, setDescription] = useState(initialData?.description || '');
+  const [vehicleId, setVehicleId] = useState(initialData?.vehicleId || '');
+  const [driverId, setDriverId] = useState(initialData?.driverId || '');
+  const [routeCode, setRouteCode] = useState(initialData?.routeCode || '');
+  const [locationLandmark, setLocationLandmark] = useState(initialData?.locationLandmark || '');
+  const [latitude, setLatitude] = useState(initialData?.latitude || 13.3382);
+  const [longitude, setLongitude] = useState(initialData?.longitude || 77.1012);
+  const [actionTaken, setActionTaken] = useState(initialData?.actionTaken || '');
   const [validationError, setValidationError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -47,11 +47,19 @@ export const IncidentForm: React.FC<IncidentFormProps> = ({
       setDescription(initialData.description);
       setVehicleId(initialData.vehicleId || '');
       setDriverId(initialData.driverId || '');
-      setRouteCode(initialData.routeCode || 'R01');
+      setRouteCode(initialData.routeCode || '');
       setLocationLandmark(initialData.locationLandmark);
       setLatitude(initialData.latitude);
       setLongitude(initialData.longitude);
       setActionTaken(initialData.actionTaken || '');
+    } else {
+      setTitle('');
+      setDescription('');
+      setVehicleId('');
+      setDriverId('');
+      setRouteCode('');
+      setLocationLandmark('');
+      setActionTaken('');
     }
   }, [initialData]);
 
@@ -160,7 +168,7 @@ export const IncidentForm: React.FC<IncidentFormProps> = ({
         required
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="e.g. Broken water pipe flooding NH48 service road"
+        placeholder="Enter incident headline / summary"
       />
 
       <FormField
@@ -170,25 +178,29 @@ export const IncidentForm: React.FC<IncidentFormProps> = ({
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         rows={3}
-        placeholder="Provide specific details, obstacles, passenger condition..."
+        placeholder="Enter situation details..."
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <FormField
           label="Affected Transit Corridor"
-          as="select"
+          as="search-select"
           value={routeCode}
           onChange={(e) => setRouteCode(e.target.value)}
-          options={routes.map((r) => ({
-            label: `${r.routeCode} — ${r.routeName.split('↔')[0].trim()}`,
-            value: r.routeCode,
-          }))}
+          options={[
+            { label: 'None / Network Wide', value: '' },
+            ...routes.map((r) => ({
+              label: `${r.routeCode} — ${r.routeName.split('↔')[0].trim()}`,
+              value: r.routeCode,
+            })),
+          ]}
+          placeholder="Search corridor (e.g. R01)..."
           icon={GitFork}
         />
 
         <FormField
-          label="Involved Fleet Bus (Optional)"
-          as="select"
+          label="Involved Bus (Optional)"
+          as="search-select"
           value={vehicleId}
           onChange={(e) => setVehicleId(e.target.value)}
           options={[
@@ -198,12 +210,13 @@ export const IncidentForm: React.FC<IncidentFormProps> = ({
               value: v.id,
             })),
           ]}
+          placeholder="Search bus (e.g. KA 06, 8558)..."
           icon={Bus}
         />
 
         <FormField
           label="Reporting Driver (Optional)"
-          as="select"
+          as="search-select"
           value={driverId}
           onChange={(e) => setDriverId(e.target.value)}
           options={[
@@ -213,6 +226,7 @@ export const IncidentForm: React.FC<IncidentFormProps> = ({
               value: d.id,
             })),
           ]}
+          placeholder="Search driver name or code..."
           icon={User}
         />
       </div>
@@ -223,7 +237,7 @@ export const IncidentForm: React.FC<IncidentFormProps> = ({
           required
           value={locationLandmark}
           onChange={(e) => setLocationLandmark(e.target.value)}
-          placeholder="e.g. Town Hall Circle, BH Road"
+          placeholder="Enter landmark or location"
           icon={MapPin}
           containerClassName="sm:col-span-2"
         />
@@ -232,7 +246,7 @@ export const IncidentForm: React.FC<IncidentFormProps> = ({
           label="Action Taken / Resolution Plan"
           value={actionTaken}
           onChange={(e) => setActionTaken(e.target.value)}
-          placeholder="e.g. Tow truck dispatched"
+          placeholder="Enter action taken or resolution notes"
         />
       </div>
 

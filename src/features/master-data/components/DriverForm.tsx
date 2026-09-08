@@ -38,8 +38,11 @@ export const DriverForm: React.FC<DriverFormProps> = ({
       setStatus(initialData.status);
       setBloodGroup(initialData.bloodGroup || 'O+');
     } else {
-      setDriverCode(`TUM-DRV-${Math.floor(1000 + Math.random() * 9000)}`);
-      setLicenseExpiry('2030-12-31');
+      setFullName('');
+      setDriverCode('');
+      setPhone('');
+      setLicenseNumber('');
+      setLicenseExpiry('');
     }
   }, [initialData]);
 

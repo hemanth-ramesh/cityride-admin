@@ -7,6 +7,7 @@ import { Modal } from '@/components/ui/Modal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { DispatchNavigationTabs } from '../components/DispatchNavigationTabs';
 import { TableColumn } from '@/types';
+import { KPICard } from '@/components/ui/KPICard';
 import {
   Navigation,
   Sparkles,
@@ -113,10 +114,10 @@ export const ScheduledTrips: React.FC = () => {
     },
     {
       key: 'plateNumber',
-      header: 'Bus & Driver',
+      header: 'Vehicle No & Driver',
       render: (row) => (
         <div className="flex flex-col text-xs">
-          <span className="font-semibold text-brand-800 dark:text-brand-300">{row.plateNumber}</span>
+          <span className="font-semibold text-blue-600 dark:text-blue-400">{row.plateNumber}</span>
           <span className="text-[10px] text-slate-500">{row.driverName}</span>
         </div>
       ),
@@ -128,11 +129,11 @@ export const ScheduledTrips: React.FC = () => {
       render: (row) => (
         <div className="flex items-center space-x-1">
           {row.delayMinutes > 0 ? (
-            <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+            <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800 dark:bg-amber-950 dark:text-amber-300">
               +{row.delayMinutes}m Late
             </span>
           ) : (
-            <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+            <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
               On Schedule
             </span>
           )}
@@ -147,40 +148,40 @@ export const ScheduledTrips: React.FC = () => {
     },
     {
       key: 'actions',
-      header: 'Dispatch Action',
+      header: 'Operational Control',
       align: 'right',
       render: (row) => (
-        <div className="flex items-center justify-end space-x-1">
+        <div className="flex items-center justify-end space-x-2">
           {row.status === 'scheduled' && (
             <button
               onClick={() => handleTransitionStatus(row, 'ready')}
-              className="rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300"
+              className="inline-flex items-center space-x-1 rounded-full bg-slate-100 hover:bg-slate-200 px-3 py-1.5 text-[11px] font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300 transition active:scale-95"
             >
-              Mark Ready
+              <span>Ready</span>
             </button>
           )}
           {row.status === 'ready' && (
             <button
               onClick={() => handleTransitionStatus(row, 'active')}
-              className="inline-flex items-center space-x-1 rounded-lg bg-emerald-600 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-emerald-700"
+              className="inline-flex items-center space-x-1 rounded-full bg-emerald-600 hover:bg-emerald-700 px-3.5 py-1.5 text-[11px] font-bold text-white shadow-xs transition active:scale-95"
             >
               <Play className="h-3 w-3" />
-              <span>Dispatch Now</span>
+              <span>Dispatch</span>
             </button>
           )}
           {row.status === 'active' && (
             <button
               onClick={() => handleTransitionStatus(row, 'completed')}
-              className="inline-flex items-center space-x-1 rounded-lg bg-blue-600 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-blue-700"
+              className="inline-flex items-center space-x-1 rounded-full bg-blue-600 hover:bg-blue-700 px-3.5 py-1.5 text-[11px] font-bold text-white shadow-xs transition active:scale-95"
             >
               <CheckCircle2 className="h-3 w-3" />
-              <span>Complete Trip</span>
+              <span>Complete</span>
             </button>
           )}
           {row.status !== 'completed' && row.status !== 'cancelled' && (
             <button
               onClick={() => setCancelTripConfirm(row)}
-              className="rounded-lg p-1 text-slate-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/50 transition"
+              className="h-8 w-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/50 transition-all active:scale-95"
               title="Cancel Trip"
             >
               <XCircle className="h-4 w-4" />
@@ -198,7 +199,7 @@ export const ScheduledTrips: React.FC = () => {
 
       {/* Alert if newly generated */}
       {generatedCountMsg && (
-        <div className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <div className="flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50/80 p-3.5 text-xs text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300">
           <span>{generatedCountMsg}</span>
           <button onClick={() => setGeneratedCountMsg(null)} className="font-bold">✕</button>
         </div>
@@ -207,8 +208,10 @@ export const ScheduledTrips: React.FC = () => {
       {/* Header & Generate Action */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <div className="flex items-center space-x-2">
-            <Navigation className="h-6 w-6 text-brand-700 dark:text-brand-400" />
+          <div className="flex items-center space-x-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+              <Navigation className="h-5 w-5" />
+            </div>
             <h1 className="text-2xl font-extrabold tracking-tight text-occ-text dark:text-white">
               Scheduled Trips Generation
             </h1>
@@ -218,12 +221,12 @@ export const ScheduledTrips: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           {/* Date Picker Bar */}
-          <div className="flex items-center space-x-1 rounded-xl border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-800 dark:bg-occ-darkCard">
+          <div className="flex items-center space-x-1 rounded-full border border-slate-200/80 bg-slate-100/90 p-1 shadow-xs dark:border-slate-700/80 dark:bg-slate-800/90 backdrop-blur-md">
             <button
               onClick={handlePrevDay}
-              className="rounded-lg p-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="h-7 w-7 rounded-full flex items-center justify-center text-slate-500 hover:bg-white dark:hover:bg-slate-700 transition"
               title="Previous Day"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -232,11 +235,11 @@ export const ScheduledTrips: React.FC = () => {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="border-none bg-transparent px-2 py-1 text-xs font-bold text-slate-800 focus:outline-none dark:text-white"
+              className="border-none bg-transparent px-2 py-0.5 text-xs font-bold text-slate-800 focus:outline-none dark:text-white"
             />
             <button
               onClick={handleNextDay}
-              className="rounded-lg p-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="h-7 w-7 rounded-full flex items-center justify-center text-slate-500 hover:bg-white dark:hover:bg-slate-700 transition"
               title="Next Day"
             >
               <ChevronRight className="h-4 w-4" />
@@ -245,44 +248,52 @@ export const ScheduledTrips: React.FC = () => {
 
           <button
             onClick={() => setGenerateModalOpen(true)}
-            className="inline-flex items-center space-x-2 rounded-xl bg-brand-700 px-4 py-2 text-xs font-bold text-white shadow-md transition hover:bg-brand-800"
+            className="inline-flex items-center space-x-2 rounded-full bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-500/25 transition-all hover:bg-blue-700 active:scale-95"
           >
-            <Sparkles className="h-4 w-4 text-brand-300" />
+            <Sparkles className="h-4 w-4 text-blue-200" />
             <span>Generate Day's Trips</span>
           </button>
         </div>
       </div>
 
       {/* Metrics Summary Strip */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-occ-darkCard">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase">Total Day's Trips</span>
-          <p className="mt-1 text-2xl font-black text-slate-900 dark:text-white">{totalTrips}</p>
-        </div>
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 shadow-sm dark:border-emerald-950 dark:bg-emerald-950/20">
-          <span className="text-[11px] font-semibold text-emerald-700 uppercase dark:text-emerald-400">En-Route Active</span>
-          <p className="mt-1 text-2xl font-black text-emerald-800 dark:text-emerald-300">{activeTrips}</p>
-        </div>
-        <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-4 shadow-sm dark:border-blue-950 dark:bg-blue-950/20">
-          <span className="text-[11px] font-semibold text-blue-700 uppercase dark:text-blue-400">Completed Trips</span>
-          <p className="mt-1 text-2xl font-black text-blue-800 dark:text-blue-300">{completedTrips}</p>
-        </div>
-        <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 shadow-sm dark:border-amber-950 dark:bg-amber-950/20">
-          <span className="text-[11px] font-semibold text-amber-700 uppercase dark:text-amber-400">Delayed / Deviated</span>
-          <p className="mt-1 text-2xl font-black text-amber-800 dark:text-amber-300">{delayedTrips}</p>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <KPICard
+          title="TOTAL DAY'S TRIPS"
+          value={totalTrips}
+          status="dark"
+          icon={Bus}
+        />
+        <KPICard
+          title="EN-ROUTE ACTIVE"
+          value={activeTrips}
+          status="teal"
+          icon={Play}
+        />
+        <KPICard
+          title="COMPLETED TRIPS"
+          value={completedTrips}
+          status="info"
+          icon={CheckCircle2}
+        />
+        <KPICard
+          title="DELAYED / DEVIATED"
+          value={delayedTrips}
+          status="warning"
+          icon={AlertTriangle}
+        />
       </div>
 
       {/* Status Filter Tabs */}
-      <div className="flex items-center space-x-2 overflow-x-auto pb-1">
+      <div className="inline-flex max-w-full overflow-x-auto items-center gap-1.5 p-1 rounded-full bg-slate-100/90 border border-slate-200/80 shadow-xs dark:bg-slate-800/90 dark:border-slate-700/80 backdrop-blur-md">
         {['ALL', 'ACTIVE', 'READY', 'SCHEDULED', 'COMPLETED', 'DELAYED'].map((filter) => (
           <button
             key={filter}
             onClick={() => setStatusFilter(filter)}
-            className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+            className={`rounded-full px-4 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-150 active:scale-95 ${
               statusFilter === filter
-                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-800 dark:bg-occ-darkCard dark:text-slate-300'
+                ? 'bg-white text-slate-900 shadow-sm shadow-slate-900/5 dark:bg-slate-700 dark:text-white'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50 dark:text-slate-400 dark:hover:text-white'
             }`}
           >
             {filter}
@@ -304,20 +315,19 @@ export const ScheduledTrips: React.FC = () => {
         isOpen={generateModalOpen}
         onClose={() => setGenerateModalOpen(false)}
         title="Generate Daily Transit Trips"
-        description="This will compile all active driver & vehicle duties for the date and synthesize official scheduled trips based on route timetables."
         size="md"
         footer={
           <>
             <button
               onClick={() => setGenerateModalOpen(false)}
-              className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300"
+              className="rounded-full bg-slate-100 hover:bg-slate-200 px-5 py-2 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition active:scale-95"
             >
               Cancel
             </button>
             <button
               onClick={handleGenerateTrips}
               disabled={isGenerating}
-              className="inline-flex items-center space-x-1.5 rounded-lg bg-brand-700 px-4 py-1.5 text-xs font-bold text-white hover:bg-brand-800 disabled:opacity-50"
+              className="inline-flex items-center space-x-1.5 rounded-full bg-blue-600 hover:bg-blue-700 px-5 py-2 text-xs font-bold text-white shadow-md shadow-blue-500/25 transition active:scale-95 disabled:opacity-50"
             >
               <Sparkles className="h-3.5 w-3.5" />
               <span>{isGenerating ? 'Generating...' : `Generate for ${selectedDate}`}</span>

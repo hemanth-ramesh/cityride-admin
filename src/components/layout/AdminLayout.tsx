@@ -11,7 +11,7 @@ export const AdminLayout: React.FC = () => {
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-occ-bg font-sans text-occ-text dark:bg-occ-darkBg dark:text-slate-100">
       {/* Desktop Sidebar */}
-      <div className="hidden lg:flex">
+      <div className="hidden lg:flex h-full">
         <Sidebar
           collapsed={collapsed}
           onToggleCollapse={() => setCollapsed(!collapsed)}
@@ -25,7 +25,7 @@ export const AdminLayout: React.FC = () => {
             className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className="relative z-50 flex h-full w-64 flex-col bg-white shadow-2xl dark:bg-occ-darkCard">
+          <div className="relative z-50 flex h-full w-64">
             <Sidebar
               collapsed={false}
               onToggleCollapse={() => setMobileMenuOpen(false)}

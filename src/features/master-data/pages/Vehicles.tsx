@@ -3,6 +3,7 @@ import { useVehicles } from '@/hooks/useMasterData';
 import { Vehicle, VehicleStatus } from '@/types/masterData';
 import { DataTable } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { KPICard } from '@/components/ui/KPICard';
 import { Modal } from '@/components/ui/Modal';
 import { VehicleForm } from '../components/VehicleForm';
 import { TableColumn } from '@/types';
@@ -12,8 +13,6 @@ import {
   Edit2,
   Trash2,
   Wrench,
-  Zap,
-  Snowflake,
   AlertTriangle,
   CheckCircle2,
 } from 'lucide-react';
@@ -62,49 +61,33 @@ export const Vehicles: React.FC = () => {
   const totalVehicles = vehicles.length;
   const activeVehicles = vehicles.filter((v) => v.status === 'active').length;
   const maintenanceCount = vehicles.filter((v) => v.status === 'maintenance').length;
-  const electricCount = vehicles.filter((v) => v.isElectric).length;
 
   const columns: TableColumn<Vehicle>[] = [
     {
       key: 'registrationNumber',
-      header: 'Vehicle / Plate #',
+      header: 'Vehicle No',
       sortable: true,
       render: (row) => (
         <div className="flex items-center space-x-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 font-bold text-slate-800 dark:bg-slate-800 dark:text-slate-200">
-            <Bus className="h-5 w-5 text-brand-700 dark:text-brand-400" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-50 font-bold text-blue-600 dark:bg-blue-950/50 dark:text-blue-400">
+            <Bus className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
               <span className="font-bold text-slate-900 dark:text-white">
                 {row.registrationNumber}
               </span>
-              {row.isElectric && (
-                <span title="Electric Vehicle">
-                  <Zap className="h-3.5 w-3.5 fill-emerald-500 text-emerald-500" />
-                </span>
-              )}
-              {row.hasAc && (
-                <span title="Air Conditioned">
-                  <Snowflake className="h-3.5 w-3.5 text-blue-500" />
-                </span>
-              )}
             </div>
-            <span className="text-[11px] font-semibold text-brand-700 dark:text-brand-400">
-              Route: {row.currentRouteCode || 'R01'}
-            </span>
+            <div className="flex items-center space-x-1.5 text-[11px]">
+              <span className="font-semibold text-blue-600 dark:text-blue-400">
+                Route: {row.currentRouteCode || 'R01'}
+              </span>
+              <span className="text-slate-300 dark:text-slate-600">•</span>
+              <span className="text-slate-500 dark:text-slate-400">
+                {row.depotName || 'Central Depot'}
+              </span>
+            </div>
           </div>
-        </div>
-      ),
-    },
-    {
-      key: 'fleetType',
-      header: 'Model / Class',
-      sortable: true,
-      render: (row) => (
-        <div className="flex flex-col">
-          <span className="font-medium text-slate-800 dark:text-slate-200">{row.fleetType}</span>
-          <span className="text-[11px] text-slate-500">{row.depotName || 'Central Depot'}</span>
         </div>
       ),
     },
@@ -116,7 +99,7 @@ export const Vehicles: React.FC = () => {
           {row.currentDriverName ? (
             <>
               <span className="font-medium text-slate-800 dark:text-slate-200">{row.currentDriverName}</span>
-              <span className="text-[11px] text-brand-600 dark:text-brand-400">
+              <span className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold">
                 Route {row.currentRouteCode || 'R01'}
               </span>
             </>
@@ -137,11 +120,11 @@ export const Vehicles: React.FC = () => {
       header: 'Actions',
       align: 'right',
       render: (row) => (
-        <div className="flex items-center justify-end space-x-1.5">
+        <div className="flex items-center justify-end space-x-1">
           <button
             onClick={() => setMaintenanceConfirmVehicle(row)}
             title={row.status === 'maintenance' ? 'Mark Operational (Active)' : 'Move to Maintenance'}
-            className={`rounded-lg p-1.5 transition ${
+            className={`h-8 w-8 rounded-full flex items-center justify-center transition-all active:scale-95 ${
               row.status === 'maintenance'
                 ? 'text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50'
                 : 'text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/50'
@@ -151,14 +134,14 @@ export const Vehicles: React.FC = () => {
           </button>
           <button
             onClick={() => handleOpenEdit(row)}
-            className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"
-            title="Edit Vehicle Specs"
+            className="h-8 w-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all active:scale-95"
+            title="Edit Bus Specs"
           >
             <Edit2 className="h-4 w-4" />
           </button>
           <button
             onClick={() => setDeleteConfirmVehicle(row)}
-            className="rounded-lg p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40"
+            className="h-8 w-8 rounded-full flex items-center justify-center text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-all active:scale-95"
             title="Decommission Vehicle"
           >
             <Trash2 className="h-4 w-4" />
@@ -173,44 +156,48 @@ export const Vehicles: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <div className="flex items-center space-x-2">
-            <Bus className="h-6 w-6 text-brand-700 dark:text-brand-400" />
+          <div className="flex items-center space-x-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+              <Bus className="h-5 w-5" />
+            </div>
             <h1 className="text-2xl font-extrabold tracking-tight text-occ-text dark:text-white">
-              Fleet & Bus Registry
+              Buses Registry
             </h1>
           </div>
           <p className="mt-1 text-xs text-occ-muted dark:text-slate-400">
-            Master database of all registered Tumakuru public transit vehicles, route assignments, and status.
+            Master database of all registered Tumakuru public transit buses, route assignments, and operational status.
           </p>
         </div>
 
         <button
           onClick={handleOpenCreate}
-          className="inline-flex items-center space-x-2 rounded-xl bg-brand-700 px-4 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-brand-800"
+          className="inline-flex items-center space-x-2 rounded-full bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-500/25 transition-all hover:bg-blue-700 active:scale-95"
         >
           <Plus className="h-4 w-4" />
           <span>Register New Bus</span>
         </button>
       </div>
 
-      {/* Fleet Metric Summary */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-occ-darkCard">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase">Total Fleet Size</span>
-          <p className="mt-1 text-2xl font-black text-slate-900 dark:text-white">{totalVehicles}</p>
-        </div>
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 shadow-sm dark:border-emerald-950 dark:bg-emerald-950/20">
-          <span className="text-[11px] font-semibold text-emerald-700 uppercase dark:text-emerald-400">Active in Service</span>
-          <p className="mt-1 text-2xl font-black text-emerald-800 dark:text-emerald-300">{activeVehicles}</p>
-        </div>
-        <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 shadow-sm dark:border-amber-950 dark:bg-amber-950/20">
-          <span className="text-[11px] font-semibold text-amber-700 uppercase dark:text-amber-400">In Depot Maintenance</span>
-          <p className="mt-1 text-2xl font-black text-amber-800 dark:text-amber-300">{maintenanceCount}</p>
-        </div>
-        <div className="rounded-xl border border-emerald-200 bg-white p-4 shadow-sm dark:border-emerald-900/40 dark:bg-occ-darkCard">
-          <span className="text-[11px] font-semibold text-emerald-600 uppercase">Electric Fleet (EV)</span>
-          <p className="mt-1 text-2xl font-black text-emerald-600 dark:text-emerald-400">{electricCount}</p>
-        </div>
+      {/* Metric Summary */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <KPICard
+          title="TOTAL BUSES"
+          value={totalVehicles}
+          status="dark"
+          icon={Bus}
+        />
+        <KPICard
+          title="ACTIVE IN SERVICE"
+          value={activeVehicles}
+          status="teal"
+          icon={CheckCircle2}
+        />
+        <KPICard
+          title="IN MAINTENANCE"
+          value={maintenanceCount}
+          status="warning"
+          icon={Wrench}
+        />
       </div>
 
       {/* DataTable */}
@@ -219,15 +206,14 @@ export const Vehicles: React.FC = () => {
         data={vehicles}
         keyExtractor={(item) => item.id}
         isLoading={isLoading}
-        searchPlaceholder="Search by plate number, route, model, depot..."
+        searchPlaceholder="Search by plate number, route, depot..."
       />
 
       {/* Edit/Create Modal */}
       <Modal
         isOpen={formModalOpen}
         onClose={() => setFormModalOpen(false)}
-        title={selectedVehicle ? `Edit Bus Specs: ${selectedVehicle.registrationNumber}` : 'Register New Transit Vehicle'}
-        description="Configure RTO plate number, route assignment, propulsion type, and depot assignment."
+        title={selectedVehicle ? `Edit Bus Specs: ${selectedVehicle.registrationNumber}` : 'Register New Bus'}
         size="lg"
       >
         <VehicleForm
@@ -249,16 +235,16 @@ export const Vehicles: React.FC = () => {
           <>
             <button
               onClick={() => setMaintenanceConfirmVehicle(null)}
-              className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300"
+              className="rounded-full bg-slate-100 hover:bg-slate-200 px-5 py-2 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition active:scale-95"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirmMaintenanceToggle}
-              className={`rounded-lg px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition ${
+              className={`rounded-full px-5 py-2 text-xs font-bold text-white shadow-md transition active:scale-95 ${
                 maintenanceConfirmVehicle?.status === 'maintenance'
-                  ? 'bg-emerald-600 hover:bg-emerald-700'
-                  : 'bg-amber-600 hover:bg-amber-700'
+                  ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/25'
+                  : 'bg-amber-600 hover:bg-amber-700 shadow-amber-500/25'
               }`}
             >
               {maintenanceConfirmVehicle?.status === 'maintenance'
@@ -297,13 +283,13 @@ export const Vehicles: React.FC = () => {
           <>
             <button
               onClick={() => setDeleteConfirmVehicle(null)}
-              className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300"
+              className="rounded-full bg-slate-100 hover:bg-slate-200 px-5 py-2 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition active:scale-95"
             >
               Cancel
             </button>
             <button
               onClick={handleDeleteConfirm}
-              className="rounded-lg bg-red-600 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-red-700"
+              className="rounded-full bg-rose-600 hover:bg-rose-700 px-5 py-2 text-xs font-bold text-white shadow-md shadow-rose-500/25 transition active:scale-95"
             >
               Decommission
             </button>

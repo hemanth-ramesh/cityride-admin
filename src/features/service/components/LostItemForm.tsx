@@ -23,8 +23,8 @@ export const LostItemForm: React.FC<LostItemFormProps> = ({
   const [description, setDescription] = useState('');
   const [color, setColor] = useState('');
   const [brand, setBrand] = useState('');
-  const [foundOnRouteCode, setFoundOnRouteCode] = useState('R01');
-  const [foundOnVehiclePlate, setFoundOnVehiclePlate] = useState('KA 06 F 8558');
+  const [foundOnRouteCode, setFoundOnRouteCode] = useState('');
+  const [foundOnVehiclePlate, setFoundOnVehiclePlate] = useState('');
   const [custodyDepot, setCustodyDepot] = useState('Central Depot 1 Security Locker');
   const [finderType, setFinderType] = useState<'DRIVER' | 'PASSENGER' | 'DEPOT_CREW'>('DRIVER');
   const [finderName, setFinderName] = useState('');
@@ -70,11 +70,11 @@ export const LostItemForm: React.FC<LostItemFormProps> = ({
         />
 
         <FormField
-          label="Item Title / Model Name"
+          label="Item Title"
           required
           value={itemName}
           onChange={(e) => setItemName(e.target.value)}
-          placeholder="e.g. Samsung Galaxy A54 (Navy Blue)"
+          placeholder="Enter item title"
         />
       </div>
 
@@ -85,7 +85,7 @@ export const LostItemForm: React.FC<LostItemFormProps> = ({
         rows={3}
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        placeholder="Include case type, scratches, stickers, contents..."
+        placeholder="Describe item, markings, condition..."
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -93,14 +93,14 @@ export const LostItemForm: React.FC<LostItemFormProps> = ({
           label="Color"
           value={color}
           onChange={(e) => setColor(e.target.value)}
-          placeholder="e.g. Black / Navy Blue"
+          placeholder="Enter color"
         />
 
         <FormField
           label="Brand / Manufacturer"
           value={brand}
           onChange={(e) => setBrand(e.target.value)}
-          placeholder="e.g. Samsung, Wildcraft"
+          placeholder="Enter brand or manufacturer"
         />
 
         <FormField
@@ -121,25 +121,33 @@ export const LostItemForm: React.FC<LostItemFormProps> = ({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           label="Found on Corridor Line"
-          as="select"
+          as="search-select"
           value={foundOnRouteCode}
           onChange={(e) => setFoundOnRouteCode(e.target.value)}
-          options={routes.map((r) => ({
-            label: `${r.routeCode} — ${r.routeName.split('↔')[0].trim()}`,
-            value: r.routeCode,
-          }))}
+          options={[
+            { label: 'None / Station Found', value: '' },
+            ...routes.map((r) => ({
+              label: `${r.routeCode} — ${r.routeName.split('↔')[0].trim()}`,
+              value: r.routeCode,
+            })),
+          ]}
+          placeholder="Search corridor (e.g. R01)..."
           icon={GitFork}
         />
 
         <FormField
           label="Found on Bus Vehicle"
-          as="select"
+          as="search-select"
           value={foundOnVehiclePlate}
           onChange={(e) => setFoundOnVehiclePlate(e.target.value)}
-          options={vehicles.map((v) => ({
-            label: `${v.registrationNumber} (${v.fleetNumber})`,
-            value: v.registrationNumber,
-          }))}
+          options={[
+            { label: 'None / Outside Bus', value: '' },
+            ...vehicles.map((v) => ({
+              label: `${v.registrationNumber} (${v.fleetNumber})`,
+              value: v.registrationNumber,
+            })),
+          ]}
+          placeholder="Search bus plate (e.g. KA 06, 8558)..."
           icon={Bus}
         />
       </div>
@@ -161,14 +169,14 @@ export const LostItemForm: React.FC<LostItemFormProps> = ({
           label="Finder Name"
           value={finderName}
           onChange={(e) => setFinderName(e.target.value)}
-          placeholder="e.g. Driver Rajesh Kumar"
+          placeholder="Enter finder name"
         />
 
         <FormField
           label="Finder Phone Number"
           value={finderPhone}
           onChange={(e) => setFinderPhone(e.target.value)}
-          placeholder="+91 98450 12345"
+          placeholder="Enter phone number"
         />
       </div>
 

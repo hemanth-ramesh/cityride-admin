@@ -26,13 +26,13 @@ export const DutyForm: React.FC<DutyFormProps> = ({
   onCancel,
   isLoading = false,
 }) => {
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [shift, setShift] = useState<ShiftType>('MORNING');
-  const [driverId, setDriverId] = useState(drivers[0]?.id || '');
-  const [vehicleId, setVehicleId] = useState(vehicles[0]?.id || '');
-  const [routeId, setRouteId] = useState(routes[0]?.id || '');
-  const [notes, setNotes] = useState('');
-  const [status, setStatus] = useState<Duty['status']>('scheduled');
+  const [date, setDate] = useState(initialData?.date || new Date().toISOString().split('T')[0]);
+  const [shift, setShift] = useState<ShiftType>(initialData?.shift || 'MORNING');
+  const [driverId, setDriverId] = useState(initialData?.driverId || '');
+  const [vehicleId, setVehicleId] = useState(initialData?.vehicleId || '');
+  const [routeId, setRouteId] = useState(initialData?.routeId || '');
+  const [notes, setNotes] = useState(initialData?.notes || '');
+  const [status, setStatus] = useState<Duty['status']>(initialData?.status || 'scheduled');
   const [validationError, setValidationError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,6 +44,12 @@ export const DutyForm: React.FC<DutyFormProps> = ({
       setRouteId(initialData.routeId);
       setNotes(initialData.notes || '');
       setStatus(initialData.status);
+    } else {
+      setDriverId('');
+      setVehicleId('');
+      setRouteId('');
+      setNotes('');
+      setStatus('scheduled');
     }
   }, [initialData]);
 
@@ -148,7 +154,7 @@ export const DutyForm: React.FC<DutyFormProps> = ({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <FormField
           label="Assigned Driver"
-          as="select"
+          as="search-select"
           required
           value={driverId}
           onChange={(e) => setDriverId(e.target.value)}
@@ -156,12 +162,13 @@ export const DutyForm: React.FC<DutyFormProps> = ({
             label: `${d.fullName} (${d.driverCode})`,
             value: d.id,
           }))}
+          placeholder="Search driver by name or code..."
           icon={User}
         />
 
         <FormField
           label="Assigned Bus Vehicle"
-          as="select"
+          as="search-select"
           required
           value={vehicleId}
           onChange={(e) => setVehicleId(e.target.value)}
@@ -169,12 +176,13 @@ export const DutyForm: React.FC<DutyFormProps> = ({
             label: `${v.registrationNumber} (${v.fleetNumber})`,
             value: v.id,
           }))}
+          placeholder="Search bus (e.g. KA 06, 8558)..."
           icon={Bus}
         />
 
         <FormField
           label="Assigned Transit Route"
-          as="select"
+          as="search-select"
           required
           value={routeId}
           onChange={(e) => setRouteId(e.target.value)}
@@ -182,6 +190,7 @@ export const DutyForm: React.FC<DutyFormProps> = ({
             label: `${r.routeCode} — ${r.routeName.split('↔')[0].trim()}`,
             value: r.id,
           }))}
+          placeholder="Search route (e.g. R01, SIT)..."
           icon={GitFork}
         />
       </div>
@@ -223,7 +232,7 @@ export const DutyForm: React.FC<DutyFormProps> = ({
           label="Special Operational Notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="e.g. Electric bus full charge verified at 05:00"
+          placeholder="Optional notes or remarks"
         />
       </div>
 

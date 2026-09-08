@@ -41,13 +41,13 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   const getConfirmBtnClasses = () => {
     switch (variant) {
       case 'danger':
-        return 'bg-rose-600 hover:bg-rose-700 text-white shadow-xs focus:ring-rose-500';
+        return 'bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-500/25 focus:ring-rose-500';
       case 'warning':
-        return 'bg-amber-600 hover:bg-amber-700 text-white shadow-xs focus:ring-amber-500';
+        return 'bg-amber-600 hover:bg-amber-700 text-white shadow-md shadow-amber-500/25 focus:ring-amber-500';
       case 'success':
-        return 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs focus:ring-emerald-500';
+        return 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/25 focus:ring-emerald-500';
       default:
-        return 'bg-brand-700 hover:bg-brand-800 text-white shadow-xs focus:ring-brand-500';
+        return 'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/25 focus:ring-blue-500';
     }
   };
 
@@ -68,7 +68,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             type="button"
             onClick={onCancel}
             disabled={isLoading}
-            className="rounded-xl border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 transition disabled:opacity-50"
+            className="rounded-full bg-slate-100 hover:bg-slate-200 px-5 py-2 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition active:scale-95 disabled:opacity-50"
           >
             {cancelLabel}
           </button>
@@ -76,7 +76,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             type="button"
             onClick={onConfirm}
             disabled={isLoading}
-            className={`rounded-xl px-4 py-2 text-xs font-bold transition disabled:opacity-50 ${getConfirmBtnClasses()}`}
+            className={`rounded-full px-5 py-2 text-xs font-bold transition active:scale-95 disabled:opacity-50 ${getConfirmBtnClasses()}`}
           >
             {isLoading ? 'Processing...' : confirmLabel}
           </button>

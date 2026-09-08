@@ -8,7 +8,7 @@ interface KPICardProps {
   subtext?: string;
   change?: number;
   changeType?: 'increase' | 'decrease' | 'neutral';
-  status?: 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+  status?: 'success' | 'warning' | 'danger' | 'info' | 'neutral' | 'teal' | 'orange' | 'dark';
   icon: LucideIcon;
   iconBgColor?: string;
   iconColor?: string;
@@ -31,31 +31,23 @@ export const KPICard: React.FC<KPICardProps> = ({
   onClick,
   className,
 }) => {
-  const statusStyles = {
-    success: 'border-emerald-200/80 bg-white hover:border-emerald-300 dark:border-emerald-900/50 dark:bg-occ-darkCard',
-    warning: 'border-amber-200/80 bg-white hover:border-amber-300 dark:border-amber-900/50 dark:bg-occ-darkCard',
-    danger: 'border-red-200/80 bg-white hover:border-red-300 dark:border-red-900/50 dark:bg-occ-darkCard',
-    info: 'border-blue-200/80 bg-white hover:border-blue-300 dark:border-blue-900/50 dark:bg-occ-darkCard',
-    neutral: 'border-slate-200/80 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-occ-darkCard',
-  };
-
-  const defaultIconTheme = {
-    success: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300',
-    warning: 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300',
-    danger: 'bg-red-50 text-red-700 dark:bg-red-950/50 dark:text-red-300',
-    info: 'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300',
-    neutral: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+  const statusStyles: Record<string, string> = {
+    orange: 'bg-[#ff681d] text-white shadow-lg shadow-orange-500/20 border-transparent',
+    success: 'bg-[#059669] text-white shadow-lg shadow-emerald-500/20 border-transparent',
+    info: 'bg-[#2563eb] text-white shadow-lg shadow-blue-500/20 border-transparent',
+    teal: 'bg-[#0d9488] text-white shadow-lg shadow-teal-500/20 border-transparent',
+    warning: 'bg-[#d97706] text-white shadow-lg shadow-amber-500/20 border-transparent',
+    danger: 'bg-[#e11d48] text-white shadow-lg shadow-rose-500/20 border-transparent',
+    neutral: 'bg-[#1e1f24] text-white shadow-lg shadow-slate-900/20 border-transparent',
+    dark: 'bg-[#1e1f24] text-white shadow-lg shadow-slate-900/20 border-transparent',
   };
 
   if (isLoading) {
     return (
-      <div className="animate-pulse rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-occ-darkCard">
-        <div className="flex items-center justify-between">
-          <div className="h-4 w-24 rounded bg-slate-200 dark:bg-slate-700" />
-          <div className="h-10 w-10 rounded-xl bg-slate-200 dark:bg-slate-700" />
-        </div>
-        <div className="mt-4 h-8 w-16 rounded bg-slate-200 dark:bg-slate-700" />
-        <div className="mt-2 h-3 w-32 rounded bg-slate-200 dark:bg-slate-700" />
+      <div className="animate-pulse rounded-2xl bg-[#1e1f24] p-6 shadow-md">
+        <div className="h-11 w-11 rounded-full bg-white/20" />
+        <div className="mt-5 h-9 w-20 rounded bg-white/20" />
+        <div className="mt-2 h-4 w-28 rounded bg-white/20" />
       </div>
     );
   }
@@ -64,52 +56,46 @@ export const KPICard: React.FC<KPICardProps> = ({
     <div
       onClick={onClick}
       className={clsx(
-        'group relative overflow-hidden rounded-xl border p-5 shadow-sm transition-all duration-200',
-        statusStyles[status],
-        onClick && 'cursor-pointer hover:shadow-md active:scale-[0.99]',
+        'group relative flex flex-col justify-between rounded-2xl p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl',
+        statusStyles[status] || statusStyles.neutral,
+        onClick && 'cursor-pointer active:scale-[0.99]',
         className
       )}
     >
+      {/* Top Row: Circular White Badge on Left */}
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold tracking-wider text-occ-muted uppercase dark:text-slate-400">
-          {title}
-        </span>
         <div
           className={clsx(
-            'flex h-10 w-10 items-center justify-center rounded-xl transition-transform group-hover:scale-105',
-            iconBgColor && iconColor ? `${iconBgColor} ${iconColor}` : defaultIconTheme[status]
+            'flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-900 shadow-sm transition-transform duration-300 group-hover:scale-110',
+            iconBgColor && iconColor ? `${iconBgColor} ${iconColor}` : ''
           )}
         >
-          <Icon className="h-5 w-5" />
+          <Icon className="h-5 w-5 stroke-[2.2]" />
         </div>
       </div>
 
-      <div className="mt-3 flex items-baseline justify-between">
-        <div className="text-2xl font-bold tracking-tight text-occ-text dark:text-white">
-          {value}
+      {/* Bottom Row: Large Number & Label on Left, Percentage on Right */}
+      <div className="mt-5 flex items-end justify-between gap-2">
+        <div>
+          <div className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white leading-none">
+            {value}
+          </div>
+          <div className="mt-2 text-xs font-semibold text-white/90 tracking-wide uppercase">
+            {title}
+          </div>
+          {subtext && (
+            <div className="mt-1 text-[11px] text-white/70 font-medium">
+              {subtext}
+            </div>
+          )}
         </div>
+
         {change !== undefined && (
-          <div
-            className={clsx(
-              'flex items-center space-x-1 text-xs font-semibold',
-              changeType === 'increase' && 'text-emerald-600 dark:text-emerald-400',
-              changeType === 'decrease' && 'text-red-600 dark:text-red-400',
-              changeType === 'neutral' && 'text-slate-500'
-            )}
-          >
-            {changeType === 'increase' && <TrendingUp className="h-3.5 w-3.5" />}
-            {changeType === 'decrease' && <TrendingDown className="h-3.5 w-3.5" />}
-            {changeType === 'neutral' && <Minus className="h-3.5 w-3.5" />}
-            <span>{change > 0 ? `+${change}%` : `${change}%`}</span>
+          <div className="shrink-0 rounded-full bg-white/20 px-2.5 py-1 text-xs font-bold text-white backdrop-blur-sm">
+            {change > 0 ? `+${change}%` : `${change}%`}
           </div>
         )}
       </div>
-
-      {subtext && (
-        <p className="mt-1 text-xs text-occ-muted dark:text-slate-400">
-          {subtext}
-        </p>
-      )}
     </div>
   );
 };

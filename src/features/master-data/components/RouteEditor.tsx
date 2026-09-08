@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TransitRoute, RouteStopSequence, BusStop } from '@/types/masterData';
 import { FormField } from '@/components/ui/FormField';
+import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import {
   GitFork,
   ArrowUp,
@@ -29,17 +30,17 @@ export const RouteEditor: React.FC<RouteEditorProps> = ({
   onCancel,
   isLoading = false,
 }) => {
-  const [routeCode, setRouteCode] = useState('R01');
-  const [routeName, setRouteName] = useState('');
-  const [viaSummary, setViaSummary] = useState('');
-  const [direction, setDirection] = useState<'UP' | 'DOWN' | 'CIRCULAR'>('UP');
-  const [colorHex, setColorHex] = useState('#059669');
-  const [dailyFrequencyMinutes, setDailyFrequencyMinutes] = useState(10);
-  const [firstBusTime, setFirstBusTime] = useState('06:00');
-  const [lastBusTime, setLastBusTime] = useState('22:00');
-  const [status, setStatus] = useState<'active' | 'suspended' | 'draft'>('active');
+  const [routeCode, setRouteCode] = useState(initialData?.routeCode || '');
+  const [routeName, setRouteName] = useState(initialData?.routeName || '');
+  const [viaSummary, setViaSummary] = useState(initialData?.viaSummary || '');
+  const [direction, setDirection] = useState<'UP' | 'DOWN' | 'CIRCULAR'>(initialData?.direction || 'UP');
+  const [colorHex, setColorHex] = useState(initialData?.colorHex || '#059669');
+  const [dailyFrequencyMinutes, setDailyFrequencyMinutes] = useState(initialData?.dailyFrequencyMinutes || 10);
+  const [firstBusTime, setFirstBusTime] = useState(initialData?.firstBusTime || '06:00');
+  const [lastBusTime, setLastBusTime] = useState(initialData?.lastBusTime || '22:00');
+  const [status, setStatus] = useState<'active' | 'suspended' | 'draft'>(initialData?.status || 'active');
 
-  const [selectedStops, setSelectedStops] = useState<RouteStopSequence[]>([]);
+  const [selectedStops, setSelectedStops] = useState<RouteStopSequence[]>(initialData?.stops || []);
   const [stopToAdd, setStopToAdd] = useState<string>('');
 
   useEffect(() => {
@@ -55,24 +56,10 @@ export const RouteEditor: React.FC<RouteEditorProps> = ({
       setStatus(initialData.status);
       setSelectedStops(initialData.stops || []);
     } else {
-      setRouteCode(`R0${Math.floor(9 + Math.random() * 90)}`);
-      // Initial default with first 3 stops
-      if (availableStops.length >= 3) {
-        const defaultSeq: RouteStopSequence[] = availableStops.slice(0, 3).map((s, idx) => ({
-          stopId: s.id,
-          stopCode: s.stopCode,
-          stopName: s.name,
-          kannadaName: s.kannadaName,
-          orderIndex: idx + 1,
-          distanceFromStartKm: Number((idx * 1.5).toFixed(1)),
-          estimatedTravelMinutes: idx * 5,
-          dwellTimeSeconds: 45,
-          latitude: s.latitude,
-          longitude: s.longitude,
-        }));
-        setSelectedStops(defaultSeq);
-        setRouteName(`${defaultSeq[0].stopName} ↔ ${defaultSeq[defaultSeq.length - 1].stopName}`);
-      }
+      setRouteCode('');
+      setRouteName('');
+      setViaSummary('');
+      setSelectedStops([]);
     }
   }, [initialData, availableStops]);
 
@@ -214,7 +201,7 @@ export const RouteEditor: React.FC<RouteEditorProps> = ({
           required
           value={routeCode}
           onChange={(e) => setRouteCode(e.target.value)}
-          placeholder="R01"
+          placeholder="e.g. R01"
           icon={GitFork}
         />
 
@@ -223,7 +210,7 @@ export const RouteEditor: React.FC<RouteEditorProps> = ({
           required
           value={routeName}
           onChange={(e) => setRouteName(e.target.value)}
-          placeholder="KSRTC Stand ↔ SIT Back Gate"
+          placeholder="e.g. KSRTC Stand ↔ SIT Back Gate"
           containerClassName="sm:col-span-2"
         />
       </div>
@@ -233,7 +220,7 @@ export const RouteEditor: React.FC<RouteEditorProps> = ({
           label="Via Summary Description"
           value={viaSummary}
           onChange={(e) => setViaSummary(e.target.value)}
-          placeholder="via SS Puram, Town Hall"
+          placeholder="e.g. via SS Puram, Town Hall"
           containerClassName="sm:col-span-2"
         />
 
@@ -241,7 +228,7 @@ export const RouteEditor: React.FC<RouteEditorProps> = ({
           label="Corridor Color Hex"
           value={colorHex}
           onChange={(e) => setColorHex(e.target.value)}
-          placeholder="#059669"
+          placeholder="e.g. #059669"
         />
 
         <FormField
@@ -294,27 +281,26 @@ export const RouteEditor: React.FC<RouteEditorProps> = ({
             </span>
           </div>
 
-          {/* Add Stop Dropdown */}
-          <div className="flex items-center space-x-2">
-            <select
+          {/* Add Stop Search Bar */}
+          <div className="flex items-center space-x-2 min-w-[300px]">
+            <SearchableSelect
               value={stopToAdd}
-              onChange={(e) => setStopToAdd(e.target.value)}
-              className="rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
-            >
-              <option value="">Select bus stop to add...</option>
-              {availableStops
+              onChange={(val) => setStopToAdd(val)}
+              placeholder="Search stop name, code, area..."
+              options={availableStops
                 .filter((s) => !selectedStops.some((seq) => seq.stopId === s.id))
-                .map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.stopCode} — {s.name} ({s.area})
-                  </option>
-                ))}
-            </select>
+                .map((s) => ({
+                  value: s.id,
+                  label: `${s.stopCode} — ${s.name} (${s.area})`,
+                }))}
+              className="py-1.5 text-xs rounded-xl"
+              containerClassName="flex-1"
+            />
             <button
               type="button"
               onClick={handleAddStop}
               disabled={!stopToAdd}
-              className="inline-flex items-center space-x-1 rounded-lg bg-brand-700 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-800 disabled:opacity-40"
+              className="inline-flex items-center space-x-1 rounded-xl bg-brand-700 px-3 py-2 text-xs font-bold text-white hover:bg-brand-800 disabled:opacity-40 transition shadow-xs cursor-pointer"
             >
               <Plus className="h-3.5 w-3.5" />
               <span>Add</span>

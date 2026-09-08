@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { BusStop, BusStopFacility } from '@/types/masterData';
+import { BusStop } from '@/types/masterData';
 import { FormField } from '@/components/ui/FormField';
 import { busStopSchema } from '@/utils/validationSchemas';
 import { StopPickerMap } from './StopPickerMap';
-import { MapPin, CheckSquare, Square, AlertCircle } from 'lucide-react';
+import { useRoutes } from '@/hooks/useMasterData';
+import { MapPin, AlertCircle, GitFork, Check } from 'lucide-react';
+import { clsx } from 'clsx';
 
 interface StopFormProps {
   initialData?: BusStop | null;
@@ -12,23 +14,13 @@ interface StopFormProps {
   isLoading?: boolean;
 }
 
-const AVAILABLE_FACILITIES: { id: BusStopFacility; label: string; description: string }[] = [
-  { id: 'bus_shelter', label: 'Bus Shelter', description: 'Covered canopy roof' },
-  { id: 'seating', label: 'Seating Benches', description: 'Passenger sitting benches' },
-  { id: 'lighting', label: 'Solar / Street Lighting', description: 'Night illumination' },
-  { id: 'passenger_info_display', label: 'PID Electronic Display', description: 'Live digital ETA board' },
-  { id: 'cctv_surveillance', label: 'CCTV Security Camera', description: '24/7 security monitoring' },
-  { id: 'wheelchair_accessible', label: 'Wheelchair Ramp', description: 'Barrier-free ramp accessibility' },
-  { id: 'drinking_water', label: 'Potable Drinking Water', description: 'Clean drinking water station' },
-  { id: 'digital_ticketing', label: 'QR / Digital Smart Pass', description: 'Contactless ticketing support' },
-];
-
 export const StopForm: React.FC<StopFormProps> = ({
   initialData,
   onSubmit,
   onCancel,
   isLoading = false,
 }) => {
+  const { routes } = useRoutes();
   const [name, setName] = useState('');
   const [kannadaName, setKannadaName] = useState('');
   const [stopCode, setStopCode] = useState('');
@@ -37,7 +29,7 @@ export const StopForm: React.FC<StopFormProps> = ({
   const [latitude, setLatitude] = useState(13.3382);
   const [longitude, setLongitude] = useState(77.1012);
   const [geofenceRadiusMeters, setGeofenceRadiusMeters] = useState(45);
-  const [facilities, setFacilities] = useState<BusStopFacility[]>(['bus_shelter', 'lighting']);
+  const [selectedRouteCodes, setSelectedRouteCodes] = useState<string[]>(initialData?.routeIds || []);
   const [isActive, setIsActive] = useState(true);
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -51,18 +43,24 @@ export const StopForm: React.FC<StopFormProps> = ({
       setLatitude(initialData.latitude);
       setLongitude(initialData.longitude);
       setGeofenceRadiusMeters(initialData.geofenceRadiusMeters || 45);
-      setFacilities(initialData.facilities || []);
-      setIsActive(initialData.isActive !== false);
+      setSelectedRouteCodes(initialData.routeIds || []);
+      setIsActive(initialData.isActive ?? true);
     } else {
-      setStopCode(`TUM_BS_${String(Math.floor(37 + Math.random() * 60)).padStart(3, '0')}`);
+      setName('');
+      setKannadaName('');
+      setStopCode('');
+      setArea('');
+      setLandmark('');
+      setSelectedRouteCodes([]);
+      setIsActive(true);
     }
   }, [initialData]);
 
-  const toggleFacility = (facilityId: BusStopFacility) => {
-    if (facilities.includes(facilityId)) {
-      setFacilities(facilities.filter((f) => f !== facilityId));
+  const toggleRoute = (routeCode: string) => {
+    if (selectedRouteCodes.includes(routeCode)) {
+      setSelectedRouteCodes(selectedRouteCodes.filter((c) => c !== routeCode));
     } else {
-      setFacilities([...facilities, facilityId]);
+      setSelectedRouteCodes([...selectedRouteCodes, routeCode]);
     }
   };
 
@@ -78,7 +76,7 @@ export const StopForm: React.FC<StopFormProps> = ({
       area,
       landmark,
       geofenceRadiusMeters: Number(geofenceRadiusMeters),
-      facilities,
+      facilities: initialData?.facilities || [],
     });
 
     if (!result.success) {
@@ -86,11 +84,15 @@ export const StopForm: React.FC<StopFormProps> = ({
       return;
     }
 
+    const matchedRouteNames = routes
+      .filter((r) => selectedRouteCodes.includes(r.routeCode))
+      .map((r) => r.routeName);
+
     await onSubmit({
       ...result.data,
       stopCode,
-      routeIds: initialData?.routeIds || [],
-      routeNames: initialData?.routeNames || [],
+      routeIds: selectedRouteCodes,
+      routeNames: matchedRouteNames,
       isActive,
     });
   };
@@ -142,6 +144,71 @@ export const StopForm: React.FC<StopFormProps> = ({
         />
       </div>
 
+      {/* Routes Served Multi-Selector */}
+      <div className="rounded-2xl border border-slate-200/90 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-900/40 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <GitFork className="h-4 w-4 text-brand-600 dark:text-brand-400" />
+            <label className="text-xs font-bold text-slate-900 dark:text-white">
+              Transit Routes Serving this Stop ({selectedRouteCodes.length} assigned)
+            </label>
+          </div>
+          <div className="flex items-center space-x-2 text-[11px]">
+            <button
+              type="button"
+              onClick={() => setSelectedRouteCodes(routes.map((r) => r.routeCode))}
+              className="font-semibold text-brand-600 hover:underline dark:text-brand-400 cursor-pointer"
+            >
+              Select All
+            </button>
+            <span className="text-slate-300 dark:text-slate-600">|</span>
+            <button
+              type="button"
+              onClick={() => setSelectedRouteCodes([])}
+              className="text-slate-400 hover:text-slate-600 hover:underline dark:hover:text-slate-300 cursor-pointer"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+          Select which bus routes stop at this station. Click route badges to assign or unassign.
+        </p>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 pt-1">
+          {routes.map((route) => {
+            const isSelected = selectedRouteCodes.includes(route.routeCode);
+            return (
+              <button
+                key={route.id}
+                type="button"
+                onClick={() => toggleRoute(route.routeCode)}
+                className={clsx(
+                  'flex items-center space-x-2.5 rounded-xl border p-2 text-left transition-all active:scale-95 cursor-pointer',
+                  isSelected
+                    ? 'border-brand-500 bg-white shadow-xs dark:bg-slate-800 ring-2 ring-brand-500/20'
+                    : 'border-slate-200 bg-white/60 text-slate-600 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-400'
+                )}
+              >
+                <span
+                  style={{ backgroundColor: route.colorHex || '#059669' }}
+                  className="flex h-6 min-w-7 shrink-0 items-center justify-center rounded-md font-mono text-[10px] font-black text-white"
+                >
+                  {route.routeCode}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <span className="block truncate text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {route.routeName.split('↔')[0].trim()}
+                  </span>
+                  <span className="block truncate text-[10px] text-slate-400">
+                    {isSelected ? '✓ Serving' : 'Not Serving'}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Interactive Map Coordinate Picker */}
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
         <StopPickerMap
@@ -183,39 +250,6 @@ export const StopForm: React.FC<StopFormProps> = ({
         </div>
       </div>
 
-      {/* Facilities Checkbox Grid */}
-      <div>
-        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-          Civic Amenities & Facilities at Stop ({facilities.length} active)
-        </label>
-        <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {AVAILABLE_FACILITIES.map((fac) => {
-            const isChecked = facilities.includes(fac.id);
-            return (
-              <button
-                key={fac.id}
-                type="button"
-                onClick={() => toggleFacility(fac.id)}
-                className={`flex items-start space-x-2 rounded-xl border p-2.5 text-left transition ${
-                  isChecked
-                    ? 'border-brand-500 bg-brand-50/50 text-brand-900 dark:bg-brand-950/40 dark:text-brand-300'
-                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400'
-                }`}
-              >
-                {isChecked ? (
-                  <CheckSquare className="mt-0.5 h-4 w-4 flex-shrink-0 text-brand-600 dark:text-brand-400" />
-                ) : (
-                  <Square className="mt-0.5 h-4 w-4 flex-shrink-0 text-slate-400" />
-                )}
-                <div>
-                  <span className="text-xs font-bold block">{fac.label}</span>
-                  <span className="text-[10px] text-slate-400 leading-tight block">{fac.description}</span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
 
       {validationError && (
         <div className="flex items-center space-x-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300">
